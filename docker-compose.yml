@@ -31,7 +31,6 @@ services:
       echo 'Database initialized!';
       exit 0"
 
-
   backend:
     build: ./backend
     container_name: crm_backend
@@ -72,23 +71,17 @@ services:
         condition: service_completed_successfully
     command: >
       sh -c "
-      echo '';
+      sleep 10;
       echo '---------------------------------------';
-      echo '🚀 Project initialized successfully!';
+      echo '🚀 Project \"$PROJECT_NAME\" initialized successfully!';
       echo '---------------------------------------';
       echo '';
-      echo 'Project: CRM Private School';
-      echo 'Maintainers: github.com/mihaiprodann & github.com/kevinvlad03';
       echo '';
       echo 'Applications:';
       echo 'Frontend:  http://localhost:3000';
       echo 'Backend:   http://localhost:8080';
       echo '';
       exit 0"
-
-
-
-
 
 volumes:
   mariadb_data:
