@@ -39,7 +39,7 @@ This project is a Customer Relationship Management (CRM) system specifically des
 1. Open a terminal in the project root directory.
 2. Run the following command:
    ```sh
-   docker-compose up --build
+   docker compose up
    ```
    This command will:
    - Build and start the **MariaDB** database container.
@@ -53,5 +53,5 @@ This project is a Customer Relationship Management (CRM) system specifically des
 ### Stop the Application
 To stop all containers, run:
 ```sh
-docker-compose down
+docker compose down
 ```
