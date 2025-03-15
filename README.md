@@ -34,6 +34,11 @@ This project is a Customer Relationship Management (CRM) system specifically des
 ## Running the Application
 ### Prerequisites
 - Install **Docker** and **Docker Compose** on your system.
+- Make sure the `db_init/init-db.sh` script is having the rights in order to be executed:
+   ```sh
+   chmod +x db_init/init-db.sh
+   chmod 644 db_init/init.sql
+   ```
 
 ### Start the Application
 1. Open a terminal in the project root directory.
