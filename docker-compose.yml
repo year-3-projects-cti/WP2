@@ -10,14 +10,26 @@ services:
       - "3307:3306"
     volumes:
       - mariadb_data:/var/lib/mysql
-      - ./db_init/init.sql:/docker-entrypoint-initdb.d/init.sql
-      - ./db_init/init-db.sh:/docker-entrypoint-initdb.d/init-db.sh
-    entrypoint: ["/bin/sh", "-c", "/docker-entrypoint-initdb.d/init-db.sh && docker-entrypoint.sh mariadbd"]
     healthcheck:
       test: ["CMD", "mariadb", "-uroot", "-proot", "-e", "SELECT 1"]
       interval: 5s
       retries: 5
       start_period: 10s
+
+  db_init:
+    image: mariadb:latest
+    depends_on:
+      database:
+        condition: service_healthy
+    volumes:
+      - ./db_init/init.sql:/docker-entrypoint-initdb.d/init.sql
+    command: >
+      sh -c "
+      echo 'Waiting for MariaDB...';
+      sleep 10;
+      mariadb -uroot -proot -h database crm_db < /docker-entrypoint-initdb.d/init.sql;
+      echo 'Database initialized!';
+      exit 0"
 
 
   backend:
@@ -46,6 +58,37 @@ services:
       - ./frontend:/app
       - /app/node_modules
     command: ["npm", "run", "dev"]
+
+  post_init:
+    image: alpine:latest
+    depends_on:
+      database:
+        condition: service_healthy
+      backend:
+        condition: service_started
+      frontend:
+        condition: service_started
+      db_init:
+        condition: service_completed_successfully
+    command: >
+      sh -c "
+      echo '';
+      echo '---------------------------------------';
+      echo '🚀 Project initialized successfully!';
+      echo '---------------------------------------';
+      echo '';
+      echo 'Project: CRM Private School';
+      echo 'Maintainers: github.com/mihaiprodann & github.com/kevinvlad03';
+      echo '';
+      echo 'Applications:';
+      echo 'Frontend:  http://localhost:3000';
+      echo 'Backend:   http://localhost:8080';
+      echo '';
+      exit 0"
+
+
+
+
 
 volumes:
   mariadb_data:
