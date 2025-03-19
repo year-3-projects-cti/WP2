@@ -1,12 +1,14 @@
 import { createRouter, createWebHistory } from "vue-router";
-import UsersView from "../views/UserView.vue";
-import AddUser from "../views/AddUser.vue";
-import Settings from "../views/Settings.vue";
+import DashboardView from "@/views/DashboardView.vue";
+import UserLogInView from "@/views/auth/UserLogInView.vue";
+import AuthView from "@/views/AuthView.vue";
+import UserRegisterView from "@/views/auth/UserRegisterView.vue";
 
 const routes = [
-  { path: "/", component: UsersView },  // Lista utilizatorilor (default)
-  { path: "/add", component: AddUser }, // Formular pentru adăugarea utilizatorilor
-  { path: "/settings", component: Settings } // Pagina de setări
+  { path: "/", component: DashboardView },
+  { path: "/login", component: UserLogInView },
+  { path: "/register", component: UserRegisterView },
+  { path: "/dashboard", component: AuthView }
 ];
 
 const router = createRouter({
