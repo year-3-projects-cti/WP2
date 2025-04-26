@@ -303,7 +303,7 @@
       });
 
       console.log('Registration successful:', response.data);
-      router.push('/dashboard');
+      router.push("/interface");
     } catch (error) {
       console.error('Registration failed:', error.response?.data || error.message);
     }

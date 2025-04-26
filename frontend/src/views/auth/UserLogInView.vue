@@ -153,7 +153,7 @@
   
       console.log('Login successful:', response.data);
       authStore.login();
-      router.push('/dashboard');
+      router.push("/interface");
     } catch (error) {
       console.error('Login failed:', error.response?.data || error.message);
       alert('Invalid email or password.');
