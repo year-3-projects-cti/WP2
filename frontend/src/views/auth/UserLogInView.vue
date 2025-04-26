@@ -134,18 +134,30 @@
   <script setup>
   import { ref } from 'vue';
   import { useRouter } from 'vue-router';
+  import { useAuthStore } from '@/stores/useAuthStore';
+  import axios from 'axios';
   
   const router = useRouter();
+  const authStore = useAuthStore();
   const email = ref('');
   const password = ref('');
   const showPassword = ref(false);
   const rememberMe = ref(false);
   
-  function handleLogin() {
-    // Here you would add your login logic
-    console.log('Login attempt with:', email.value, password.value);
-    // For demo purposes, redirect to dashboard
-    router.push('/dashboard');
+  async function handleLogin() {
+    try {
+      const response = await axios.post('http://localhost:8080/api/users/login', {
+        email: email.value,
+        password: password.value
+      });
+  
+      console.log('Login successful:', response.data);
+      authStore.login();
+      router.push('/dashboard');
+    } catch (error) {
+      console.error('Login failed:', error.response?.data || error.message);
+      alert('Invalid email or password.');
+    }
   }
   
   function goBack() {
@@ -156,6 +168,8 @@
     router.push('/register');
   }
   </script>
+  
+  
   
   <style scoped>
   /* Base styles */

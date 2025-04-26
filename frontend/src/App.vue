@@ -1,8 +1,8 @@
 <template>
   <div class="app-wrapper">
-    <NavBar :isSticky="true" :connected="isAuthenticated" />
+    <NavBar :isSticky="true" :connected="authStore.isAuthenticated" />
 
-    <router-view v-if="!isAuthenticated" />
+    <router-view v-if="!authStore.isAuthenticated" />
     <AuthView v-else />
 
     <footer class="app-footer">
@@ -12,10 +12,11 @@
 </template>
 
 <script setup>
-import { ref } from "vue";
+import { useAuthStore } from "@/stores/useAuthStore";
+import { storeToRefs } from "pinia";
 import NavBar from "./components/NavBar.vue";
 import AuthView from "./views/AuthView.vue";
 
-const isAuthenticated = ref(false);
-
+const authStore = useAuthStore();
+const { isAuthenticated } = storeToRefs(authStore);
 </script>

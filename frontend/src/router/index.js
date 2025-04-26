@@ -3,6 +3,7 @@ import DashboardView from "@/views/DashboardView.vue";
 import UserLogInView from "@/views/auth/UserLogInView.vue";
 import AuthView from "@/views/AuthView.vue";
 import UserRegisterView from "@/views/auth/UserRegisterView.vue";
+import { useAuthStore } from "@/stores/useAuthStore";
 
 const routes = [
   { path: "/", component: DashboardView },
@@ -14,6 +15,16 @@ const routes = [
 const router = createRouter({
   history: createWebHistory(),
   routes,
+});
+
+router.beforeEach((to, from, next) => {
+  const authStore = useAuthStore();
+
+  if (to.path === "/dashboard" && !authStore.isAuthenticated) {
+    next("/login");
+  } else {
+    next();
+  }
 });
 
 export default router;

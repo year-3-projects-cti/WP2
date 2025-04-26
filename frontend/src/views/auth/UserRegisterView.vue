@@ -219,6 +219,8 @@
   <script setup>
   import { ref, computed, watch } from 'vue';
   import { useRouter } from 'vue-router';
+  import axios from 'axios';
+
   
   const router = useRouter();
   
@@ -287,20 +289,26 @@
            agreeToTerms.value;
   });
   
-  function handleRegister() {
+  async function handleRegister() {
     if (!formValid.value) return;
-    
-    // Here you would add your registration logic
-    console.log('Registration with:', {
-      firstName: firstName.value,
-      lastName: lastName.value,
-      email: email.value,
-      company: company.value
-    });
-    
-    // Redirect to dashboard after successful registration
-    router.push('/dashboard');
+
+    try {
+      const fullName = `${firstName.value} ${lastName.value}`;
+
+      const response = await axios.post('http://localhost:8080/api/users', {
+        name: fullName,
+        email: email.value,
+        company: company.value,
+        password: password.value,
+      });
+
+      console.log('Registration successful:', response.data);
+      router.push('/dashboard');
+    } catch (error) {
+      console.error('Registration failed:', error.response?.data || error.message);
+    }
   }
+
   
   function goBack() {
     router.push('/');
