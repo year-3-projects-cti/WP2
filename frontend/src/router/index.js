@@ -5,6 +5,7 @@ import UserRegisterView from "@/views/auth/UserRegisterView.vue";
 import InterfaceView from "@/views/interface/InterfaceView.vue";
 import StudentsView from "@/views/interface/StudentsView.vue";
 import TeachersView from "@/views/interface/TeachersView.vue";
+import CalendarView from "@/views/interface/CalendarView.vue";
 import { useAuthStore } from "@/stores/useAuthStore";
 import CoursesView from "@/views/interface/CoursesView.vue";
 
@@ -15,7 +16,7 @@ const routes = [
   { path: "/interface", component: InterfaceView, meta: { requiresAuth: true } },
   { path: "/students", component: StudentsView, meta: { requiresAuth: true } },
   { path: "/teachers", component: TeachersView, meta: { requiresAuth: true } },
-  { path: "/courses", component: CoursesView, meta: { requiresAuth: true } },
+  { path: "/calendar", component: CalendarView, meta: { requiresAuth: true } },
 
 ];
 
