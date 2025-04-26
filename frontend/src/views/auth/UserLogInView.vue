@@ -132,42 +132,51 @@
   </template>
   
   <script setup>
-  import { ref } from 'vue';
-  import { useRouter } from 'vue-router';
-  import { useAuthStore } from '@/stores/useAuthStore';
-  import axios from 'axios';
-  
-  const router = useRouter();
-  const authStore = useAuthStore();
-  const email = ref('');
-  const password = ref('');
-  const showPassword = ref(false);
-  const rememberMe = ref(false);
-  
-  async function handleLogin() {
-    try {
-      const response = await axios.post('http://localhost:8080/api/users/login', {
-        email: email.value,
-        password: password.value
-      });
-  
-      console.log('Login successful:', response.data);
-      authStore.login();
-      router.push("/interface");
-    } catch (error) {
-      console.error('Login failed:', error.response?.data || error.message);
-      alert('Invalid email or password.');
-    }
+import { ref } from 'vue';
+import { useRouter } from 'vue-router';
+import { useAuthStore } from '@/stores/useAuthStore';
+import { useUsersStore } from '@/stores/usersStore'; // 🔥 adăugăm importul usersStore
+import axios from 'axios';
+
+const router = useRouter();
+const authStore = useAuthStore();
+const usersStore = useUsersStore(); // 🔥 instanțiem usersStore
+
+const email = ref('');
+const password = ref('');
+const showPassword = ref(false);
+const rememberMe = ref(false);
+
+async function handleLogin() {
+  try {
+    const response = await axios.post('http://localhost:8080/api/users/login', {
+      email: email.value,
+      password: password.value
+    });
+
+    console.log('Login successful:', response.data);
+
+    const user = response.data;
+    authStore.login();
+    usersStore.user = user; // 🔥 setăm în store
+    localStorage.setItem('userId', user.id); // 🔥 salvăm ID-ul în localStorage
+
+    router.push("/interface");
+  } catch (error) {
+    console.error('Login failed:', error.response?.data || error.message);
+    alert('Invalid email or password.');
   }
-  
-  function goBack() {
-    router.push('/');
-  }
-  
-  function goToRegister() {
-    router.push('/register');
-  }
-  </script>
+}
+
+function goBack() {
+  router.push('/');
+}
+
+function goToRegister() {
+  router.push('/register');
+}
+</script>
+
   
   
   

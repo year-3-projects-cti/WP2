@@ -29,4 +29,12 @@ public class UserController {
     public User login(@RequestBody User loginRequest) {
         return userService.login(loginRequest.getEmail(), loginRequest.getPassword());
     }
+
+    @GetMapping("/{id}")
+    public User getUserById(@PathVariable Long id) {
+        return userService.getUserById(id);
+    }
+
+    
+
 }

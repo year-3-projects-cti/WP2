@@ -18,14 +18,13 @@
             <i class="fas fa-bell"></i>
             <span class="notification-badge">3</span>
           </button>
-          <!-- User Profile -->
         <!-- User Profile -->
-        <!-- <div v-if="usersStore.user" class="user-profile">
+        <div v-if="usersStore.user" class="user-profile">
             <img src="" alt="Profile" class="user-avatar" />
             <span class="user-name">{{ usersStore.user.name }}</span>
             <span class="user-role">{{ usersStore.user.role }}</span>
             <i class="fas fa-chevron-down"></i>
-        </div> -->
+        </div>
           <button @click="handleLogout" class="logout-btn">
             Logout
             </button>
@@ -34,80 +33,16 @@
   
       <div class="main-container">
         <Sidebar />
-        <!-- Sidebar
-        <aside class="sidebar">
-          <nav>
-            <div class="sidebar-header">
-              <h3>Menu</h3>
-            </div>
-            <ul class="sidebar-menu">
-              <li class="menu-item active">
-                <router-link to="/dashboard">
-                  <i class="fas fa-tachometer-alt"></i>
-                  <span>Dashboard</span>
-                </router-link>
-              </li>
-              <li class="menu-item">
-                <router-link to="/students">
-                  <i class="fas fa-user-graduate"></i>
-                  <span>Students</span>
-                </router-link>
-              </li>
-              <li class="menu-item">
-                <router-link to="/teachers">
-                  <i class="fas fa-chalkboard-teacher"></i>
-                  <span>Teachers</span>
-                </router-link>
-              </li>
-              <li class="menu-item">
-                <router-link to="/classes">
-                  <i class="fas fa-chalkboard"></i>
-                  <span>Classes</span>
-                </router-link>
-              </li>
-              <li class="menu-item">
-                <router-link to="/calendar">
-                  <i class="fas fa-calendar-alt"></i>
-                  <span>Calendar</span>
-                </router-link>
-              </li>
-              <li class="menu-item">
-                <router-link to="/payments">
-                  <i class="fas fa-credit-card"></i>
-                  <span>Payments</span>
-                </router-link>
-              </li>
-              <li class="menu-item">
-                <router-link to="/reports">
-                  <i class="fas fa-chart-line"></i>
-                  <span>Reports</span>
-                </router-link>
-              </li>
-              <li class="menu-item">
-                <router-link to="/messages">
-                  <i class="fas fa-comments"></i>
-                  <span>Messages</span>
-                  <span class="menu-badge">5</span>
-                </router-link>
-              </li>
-              <li class="menu-item">
-                <router-link to="/settings">
-                  <i class="fas fa-cog"></i>
-                  <span>Settings</span>
-                </router-link>
-              </li>
-            </ul>
-          </nav>
-        </aside> -->
   
         <!-- Main content -->
         <main class="main-content">
           <div class="content-wrapper">
             <!-- Welcome section -->
             <section class="welcome-panel glass-panel">
-                <!-- <h1 v-if="usersStore.user" class="welcome-title">
-  Welcome, {{ usersStore.user.name }}
-</h1> -->
+              <h1 v-if="usersStore.user" class="welcome-title">
+                Welcome, {{ usersStore.user.name }}
+              </h1>
+
               <p class="welcome-subtitle">Here is an overview of your day</p>
   
               <div class="stats-container">
@@ -216,55 +151,65 @@
   </template>
   
   <script setup>
-  import { ref, onMounted, computed } from 'vue'
-  import { useStudentsStore } from '@/stores/studentsStore'
+import { ref, onMounted, computed } from 'vue'
+import { useStudentsStore } from '@/stores/studentsStore'
+import { useUsersStore } from '@/stores/usersStore' // 🔥 importăm usersStore
+import { useAuthStore } from '@/stores/useAuthStore'
+import { useRouter } from 'vue-router'
   import Sidebar from '@/components/SideBar.vue'
 
-  const studentsStore = useStudentsStore()
+const router = useRouter()
+const authStore = useAuthStore()
+const studentsStore = useStudentsStore()
+const usersStore = useUsersStore() // 🔥 instanțiem usersStore
 
-  const user = ref({
-    name: 'John Smith',
-    role: 'Administrator'
-  })
+const hours = ref([8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18])
+const currentDate = ref('April 26, 2025')
 
-  const hours = ref([8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18])
+const todayEvents = ref([
+  { id: 1, title: 'Mathematics', startHour: 9, startMinute: 0, duration: 1.5, location: 'Room A102', teacher: 'Mary Laurent', seatsTotal: 25, seatsOccupied: 22, status: 'past' },
+  { id: 2, title: 'Physics', startHour: 11, startMinute: 0, duration: 2, location: 'Room B201', teacher: 'Peter Martin', seatsTotal: 20, seatsOccupied: 20, status: 'current' },
+  { id: 3, title: 'English', startHour: 14, startMinute: 30, duration: 1.5, location: 'Room C305', teacher: 'Sophie White', seatsTotal: 15, seatsOccupied: 12, status: 'upcoming' },
+  { id: 4, title: 'Computer Science', startHour: 16, startMinute: 15, duration: 2, location: 'Room D110', teacher: 'Thomas Black', seatsTotal: 18, seatsOccupied: 15, status: 'upcoming' }
+])
 
-  const currentDate = ref('April 26, 2025')
+const recentActivities = ref([
+  { id: 1, type: 'student', description: 'New student registered: Emma Small', time: '10 minutes ago' },
+  { id: 2, type: 'class', description: '"Advanced Chemistry" course added to schedule', time: '35 minutes ago' },
+  { id: 3, type: 'payment', description: 'Payment received from the Martin family', time: '2 hours ago' },
+  { id: 4, type: 'message', description: 'New message from Prof. Dubois', time: '3 hours ago' },
+  { id: 5, type: 'admin', description: 'System update completed', time: '5 hours ago' }
+])
 
-  const todayEvents = ref([
-    { id: 1, title: 'Mathematics', startHour: 9, startMinute: 0, duration: 1.5, location: 'Room A102', teacher: 'Mary Laurent', seatsTotal: 25, seatsOccupied: 22, status: 'past' },
-    { id: 2, title: 'Physics', startHour: 11, startMinute: 0, duration: 2, location: 'Room B201', teacher: 'Peter Martin', seatsTotal: 20, seatsOccupied: 20, status: 'current' },
-    { id: 3, title: 'English', startHour: 14, startMinute: 30, duration: 1.5, location: 'Room C305', teacher: 'Sophie White', seatsTotal: 15, seatsOccupied: 12, status: 'upcoming' },
-    { id: 4, title: 'Computer Science', startHour: 16, startMinute: 15, duration: 2, location: 'Room D110', teacher: 'Thomas Black', seatsTotal: 18, seatsOccupied: 15, status: 'upcoming' }
-  ])
+const notifications = ref([
+  { id: 1, type: 'alert', message: 'Teachers meeting tomorrow at 2:00 PM', time: '20 minutes ago', read: false },
+  { id: 2, type: 'info', message: 'New shared document: "Second Trimester Schedule"', time: '1 hour ago', read: false },
+  { id: 3, type: 'reminder', message: 'Exam registration deadline: April 28', time: '3 hours ago', read: false },
+  { id: 4, type: 'message', message: 'New message from Mary Laurent', time: 'Yesterday', read: true }
+])
 
-  const recentActivities = ref([
-    { id: 1, type: 'student', description: 'New student registered: Emma Small', time: '10 minutes ago' },
-    { id: 2, type: 'class', description: '"Advanced Chemistry" course added to schedule', time: '35 minutes ago' },
-    { id: 3, type: 'payment', description: 'Payment received from the Martin family', time: '2 hours ago' },
-    { id: 4, type: 'message', description: 'New message from Prof. Dubois', time: '3 hours ago' },
-    { id: 5, type: 'admin', description: 'System update completed', time: '5 hours ago' }
-  ])
+const stats = computed(() => [
+  { title: 'Students', value: studentsStore.students.length, icon: 'fas fa-user-graduate' },
+  { title: 'Active Classes', value: 24, icon: 'fas fa-chalkboard' },
+  { title: 'Courses Today', value: 8, icon: 'fas fa-calendar-check' },
+  { title: 'New Messages', value: 5, icon: 'fas fa-envelope' }
+])
 
-  const notifications = ref([
-    { id: 1, type: 'alert', message: 'Teachers meeting tomorrow at 2:00 PM', time: '20 minutes ago', read: false },
-    { id: 2, type: 'info', message: 'New shared document: "Second Trimester Schedule"', time: '1 hour ago', read: false },
-    { id: 3, type: 'reminder', message: 'Exam registration deadline: April 28', time: '3 hours ago', read: false },
-    { id: 4, type: 'message', message: 'New message from Mary Laurent', time: 'Yesterday', read: true }
-  ])
-
-  const stats = computed(() => [
-    { title: 'Students', value: studentsStore.students.length, icon: 'fas fa-user-graduate' },
-    { title: 'Active Classes', value: 24, icon: 'fas fa-chalkboard' },
-    { title: 'Courses Today', value: 8, icon: 'fas fa-calendar-check' },
-    { title: 'New Messages', value: 5, icon: 'fas fa-envelope' }
-  ])
-
-  onMounted(async () => {
-    await studentsStore.fetchStudents()
-  })
+onMounted(async () => {
+  await studentsStore.fetchStudents()
   
-  function formatEventTime(event) {
+  const userId = localStorage.getItem('userId')
+  if (userId) {
+    await usersStore.fetchUser(userId)
+  }
+})
+
+function handleLogout() {
+  authStore.logout();
+  localStorage.removeItem('userId')
+  router.push("/login");
+}
+function formatEventTime(event) {
     const startHour = event.startHour.toString().padStart(2, '0')
     const startMin = event.startMinute.toString().padStart(2, '0')
     const endMinutes = (event.startHour * 60 + event.startMinute) + (event.duration * 60)
@@ -272,7 +217,6 @@
     const endMin = Math.floor(endMinutes % 60)
     return `${startHour}:${startMin} - ${endHour.toString().padStart(2, '0')}:${endMin.toString().padStart(2, '0')}`
   }
-  
   function getActivityIcon(type) {
     const icons = {
       student: 'fas fa-user-graduate',
@@ -293,12 +237,8 @@
     }
     return icons[type] || 'fas fa-bell'
   }
+</script>
 
-  function handleLogout() {
-  authStore.logout();
-  router.push("/login");
-}
-  </script>
   
   
   <style scoped>

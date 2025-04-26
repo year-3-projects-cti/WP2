@@ -8,10 +8,10 @@ export const useUsersStore = defineStore('users', {
     error: null
   }),
   actions: {
-    async fetchUser() {
+    async fetchUser(id) {
       this.loading = true
       try {
-        const response = await axios.get('/api/users/me')
+        const response = await axios.get(`/api/users/${id}`)
         this.user = response.data
       } catch (error) {
         console.error('Failed to fetch user', error)
