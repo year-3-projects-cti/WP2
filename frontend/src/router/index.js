@@ -17,6 +17,7 @@ const routes = [
   { path: "/students", component: StudentsView, meta: { requiresAuth: true } },
   { path: "/teachers", component: TeachersView, meta: { requiresAuth: true } },
   { path: "/calendar", component: CalendarView, meta: { requiresAuth: true } },
+  { path: "/courses", component: CoursesView, meta: { requiresAuth: true } },
 
 ];
 
