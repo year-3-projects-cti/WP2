@@ -1,175 +1,145 @@
 <template>
-    <div class="dashboard-container">
-      <div class="main-container">
-        <main class="main-content">
-          <div class="glass-panel">
-            <h1 class="welcome-title">Students Management</h1>
-  
-            <!-- Add Student Form -->
-            <section class="glass-panel" style="margin-bottom: 30px;">
-              <h2>Add New Student</h2>
-              <form @submit.prevent="addStudent">
-                <div class="form-group">
-                  <input v-model="newStudent.name" type="text" placeholder="Name" required />
-                </div>
-                <div class="form-group">
-                  <input v-model="newStudent.email" type="email" placeholder="Email" required />
-                </div>
-                <div class="form-group">
-                  <input v-model="newStudent.studentClass" type="text" placeholder="Class" required />
-                </div>
-                <div class="form-group">
-                  <select v-model="newStudent.status" required>
-                    <option value="" disabled>Select status</option>
-                    <option value="Active">Active</option>
-                    <option value="Inactive">Inactive</option>
-                  </select>
-                </div>
-                <button class="btn-join" type="submit">Add Student</button>
-              </form>
-            </section>
-  
-            <!-- Students List -->
-            <section class="glass-panel">
-              <h2>Student List</h2>
-              <table class="students-table">
-                <thead>
-                  <tr>
-                    <th>Name</th>
-                    <th>Email</th>
-                    <th>Class</th>
-                    <th>Status</th>
-                    <th>Actions</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr v-for="student in students" :key="student.id">
-                    <td>{{ student.name }}</td>
-                    <td>{{ student.email }}</td>
-                    <td>{{ student.studentClass }}</td>
-                    <td>{{ student.status }}</td>
-                    <td>
-                      <button class="btn-details" @click="populateEditStudent(student)">Edit</button>
-                      <button class="btn-join" @click="deleteStudent(student.id)">Delete</button>
-                    </td>
-                  </tr>
-                </tbody>
-              </table>
-            </section>
-  
-            <!-- Edit Student Form -->
-            <section class="glass-panel" v-if="editMode">
-              <h2>Edit Student</h2>
-              <form @submit.prevent="updateStudent">
-                <div class="form-group">
-                  <input v-model="editStudent.name" type="text" placeholder="Name" required />
-                </div>
-                <div class="form-group">
-                  <input v-model="editStudent.email" type="email" placeholder="Email" required />
-                </div>
-                <div class="form-group">
-                  <input v-model="editStudent.studentClass" type="text" placeholder="Class" required />
-                </div>
-                <div class="form-group">
-                  <select v-model="editStudent.status" required>
-                    <option value="" disabled>Select status</option>
-                    <option value="Active">Active</option>
-                    <option value="Inactive">Inactive</option>
-                  </select>
-                </div>
-                <button class="btn-join" type="submit">Save Changes</button>
-                <button class="btn-details" @click="cancelEdit" type="button">Cancel</button>
-              </form>
-            </section>
-  
-          </div>
-        </main>
-      </div>
+  <div class="dashboard-container">
+    <div class="main-container">
+      <main class="main-content">
+        <div class="glass-panel">
+          <h1 class="welcome-title">Students Management</h1>
+
+          <!-- Add Student Form -->
+          <section class="glass-panel" style="margin-bottom: 30px;">
+            <h2>Add New Student</h2>
+            <form @submit.prevent="addStudent">
+              <div class="form-group">
+                <input v-model="newStudent.name" type="text" placeholder="Name" required />
+              </div>
+              <div class="form-group">
+                <input v-model="newStudent.email" type="email" placeholder="Email" required />
+              </div>
+              <div class="form-group">
+                <input v-model="newStudent.studentClass" type="text" placeholder="Class" required />
+              </div>
+              <div class="form-group">
+                <select v-model="newStudent.status" required>
+                  <option value="" disabled>Select status</option>
+                  <option value="Active">Active</option>
+                  <option value="Inactive">Inactive</option>
+                </select>
+              </div>
+              <button class="btn-join" type="submit">Add Student</button>
+            </form>
+          </section>
+
+          <!-- Students List -->
+          <section class="glass-panel">
+            <h2>Student List</h2>
+            <table class="students-table">
+              <thead>
+                <tr>
+                  <th>Name</th>
+                  <th>Email</th>
+                  <th>Class</th>
+                  <th>Status</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr v-for="student in studentsStore.students" :key="student.id">
+                  <td>{{ student.name }}</td>
+                  <td>{{ student.email }}</td>
+                  <td>{{ student.studentClass }}</td>
+                  <td>{{ student.status }}</td>
+                  <td>
+                    <button class="btn-details" @click="populateEditStudent(student)">Edit</button>
+                    <button class="btn-join" @click="deleteStudent(student.id)">Delete</button>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </section>
+
+          <!-- Edit Student Form -->
+          <section class="glass-panel" v-if="editMode">
+            <h2>Edit Student</h2>
+            <form @submit.prevent="updateStudent">
+              <div class="form-group">
+                <input v-model="editStudent.name" type="text" placeholder="Name" required />
+              </div>
+              <div class="form-group">
+                <input v-model="editStudent.email" type="email" placeholder="Email" required />
+              </div>
+              <div class="form-group">
+                <input v-model="editStudent.studentClass" type="text" placeholder="Class" required />
+              </div>
+              <div class="form-group">
+                <select v-model="editStudent.status" required>
+                  <option value="" disabled>Select status</option>
+                  <option value="Active">Active</option>
+                  <option value="Inactive">Inactive</option>
+                </select>
+              </div>
+              <button class="btn-join" type="submit">Save Changes</button>
+              <button class="btn-details" @click="cancelEdit" type="button">Cancel</button>
+            </form>
+          </section>
+
+        </div>
+      </main>
     </div>
-  </template>
-  
-  <script setup>
-  import { ref, onMounted } from 'vue'
-  import axios from 'axios'
-  
-  const students = ref([])
-  const newStudent = ref({
-    name: '',
-    email: '',
-    studentClass: '',
-    status: ''
-  })
-  
-  const editMode = ref(false)
-  const editStudent = ref({
-    id: null,
-    name: '',
-    email: '',
-    studentClass: '',
-    status: ''
-  })
-  
-  const fetchStudents = async () => {
-    try {
-      const response = await axios.get('/api/students')
-      students.value = response.data
-    } catch (error) {
-      console.error('Error fetching students:', error)
-    }
-  }
-  
-  const addStudent = async () => {
-    try {
-        await axios.post('/api/students', newStudent.value, {
-  headers: {
-    'Content-Type': 'application/json'
-  }
+  </div>
+</template>
+
+<script setup>
+import { ref, onMounted } from 'vue'
+import { useStudentsStore } from '@/stores/studentsStore'
+
+const studentsStore = useStudentsStore()
+
+const newStudent = ref({
+  name: '',
+  email: '',
+  studentClass: '',
+  status: ''
 })
-      await fetchStudents()
-      newStudent.value = { name: '', email: '', studentClass: '', status: '' }
-    } catch (error) {
-      console.error('Error adding student:', error)
-    }
-  }
-  
-  const deleteStudent = async (id) => {
-    try {
-      await axios.delete(`/api/students/${id}`)
-      await fetchStudents()
-    } catch (error) {
-      console.error('Error deleting student:', error)
-    }
-  }
-  
-  const populateEditStudent = (student) => {
-    editMode.value = true
-    editStudent.value = { ...student }
-  }
-  
-  const updateStudent = async () => {
-    try {
-      await axios.put(`/api/students/${editStudent.value.id}`, editStudent.value, {
-  headers: {
-    'Content-Type': 'application/json'
-  }
+
+const editMode = ref(false)
+const editStudent = ref({
+  id: null,
+  name: '',
+  email: '',
+  studentClass: '',
+  status: ''
 })
-      editMode.value = false
-      await fetchStudents()
-    } catch (error) {
-      console.error('Error updating student:', error)
-    }
-  }
-  
-  const cancelEdit = () => {
-    editMode.value = false
-    editStudent.value = { id: null, name: '', email: '', studentClass: '', status: '' }
-  }
-  
-  onMounted(() => {
-    fetchStudents()
-  })
-  </script>
-  
+
+const fetchStudents = async () => {
+  await studentsStore.fetchStudents()
+}
+
+const addStudent = async () => {
+  await studentsStore.addStudent(newStudent.value)
+  newStudent.value = { name: '', email: '', studentClass: '', status: '' }
+}
+
+const deleteStudent = async (id) => {
+  await studentsStore.deleteStudent(id)
+}
+
+const populateEditStudent = (student) => {
+  editMode.value = true
+  editStudent.value = { ...student }
+}
+
+const updateStudent = async () => {
+  await studentsStore.updateStudent(editStudent.value.id, editStudent.value)
+  editMode.value = false
+}
+
+const cancelEdit = () => {
+  editMode.value = false
+  editStudent.value = { id: null, name: '', email: '', studentClass: '', status: '' }
+}
+
+onMounted(fetchStudents)
+</script>  
   <style scoped>
   .students-table {
     width: 100%;

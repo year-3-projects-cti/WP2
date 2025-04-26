@@ -1,6 +1,5 @@
 import { defineStore } from 'pinia'
 import axios from 'axios'
-
 export const useStudentsStore = defineStore('students', {
   state: () => ({
     students: [],
@@ -22,9 +21,7 @@ export const useStudentsStore = defineStore('students', {
     },
     async addStudent(student) {
       try {
-        await axios.post('/api/students', student, {
-          headers: { 'Content-Type': 'application/json' }
-        })
+        await axios.post('/api/students', student)
         await this.fetchStudents()
       } catch (error) {
         this.error = 'Failed to add student'
@@ -33,9 +30,7 @@ export const useStudentsStore = defineStore('students', {
     },
     async updateStudent(id, student) {
       try {
-        await axios.put(`/api/students/${id}`, student, {
-          headers: { 'Content-Type': 'application/json' }
-        })
+        await axios.put(`/api/students/${id}`, student)
         await this.fetchStudents()
       } catch (error) {
         this.error = 'Failed to update student'
