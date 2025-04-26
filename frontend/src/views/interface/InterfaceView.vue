@@ -20,12 +20,12 @@
           </button>
           <!-- User Profile -->
         <!-- User Profile -->
-        <div v-if="usersStore.user" class="user-profile">
+        <!-- <div v-if="usersStore.user" class="user-profile">
             <img src="" alt="Profile" class="user-avatar" />
             <span class="user-name">{{ usersStore.user.name }}</span>
             <span class="user-role">{{ usersStore.user.role }}</span>
             <i class="fas fa-chevron-down"></i>
-        </div>
+        </div> -->
           <button @click="handleLogout" class="logout-btn">
             Logout
             </button>
@@ -104,9 +104,9 @@
           <div class="content-wrapper">
             <!-- Welcome section -->
             <section class="welcome-panel glass-panel">
-                <h1 v-if="usersStore.user" class="welcome-title">
+                <!-- <h1 v-if="usersStore.user" class="welcome-title">
   Welcome, {{ usersStore.user.name }}
-</h1>
+</h1> -->
               <p class="welcome-subtitle">Here is an overview of your day</p>
   
               <div class="stats-container">
