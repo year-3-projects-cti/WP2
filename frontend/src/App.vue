@@ -1,6 +1,5 @@
 <template>
   <div class="app-wrapper">
-    <NavBar :isSticky="true" :connected="isAuthenticated" />
 
     <router-view v-if="!isAuthenticated" />
     <AuthView v-else />
