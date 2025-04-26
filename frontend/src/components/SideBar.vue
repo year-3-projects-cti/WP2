@@ -7,56 +7,56 @@
         <ul class="sidebar-menu">
           <li class="menu-item" :class="{ active: isActive('/interface') }">
             <router-link to="/interface">
-              <i class="fas fa-tachometer-alt"></i>
+              <i class="fas fa-house-user"></i>
               <span>Dashboard</span>
             </router-link>
           </li>
           <li class="menu-item" :class="{ active: isActive('/students') }">
             <router-link to="/students">
-              <i class="fas fa-user-graduate"></i>
+              <i class="fas fa-users"></i>
               <span>Students</span>
             </router-link>
           </li>
           <li class="menu-item" :class="{ active: isActive('/teachers') }">
             <router-link to="/teachers">
-              <i class="fas fa-chalkboard-teacher"></i>
+              <i class="fas fa-user-tie"></i>
               <span>Teachers</span>
             </router-link>
           </li>
           <li class="menu-item" :class="{ active: isActive('/courses') }">
             <router-link to="/courses">
-              <i class="fas fa-chalkboard"></i>
+              <i class="fas fa-book-open"></i>
               <span>Courses</span>
             </router-link>
           </li>
           <li class="menu-item" :class="{ active: isActive('/calendar') }">
             <router-link to="/calendar">
-              <i class="fas fa-calendar-alt"></i>
+              <i class="fas fa-calendar-check"></i>
               <span>Calendar</span>
             </router-link>
           </li>
           <li class="menu-item" :class="{ active: isActive('/payments') }">
             <router-link to="/payments">
-              <i class="fas fa-credit-card"></i>
+              <i class="fas fa-wallet"></i>
               <span>Payments</span>
             </router-link>
           </li>
           <li class="menu-item" :class="{ active: isActive('/reports') }">
             <router-link to="/reports">
-              <i class="fas fa-chart-line"></i>
+              <i class="fas fa-chart-pie"></i>
               <span>Reports</span>
             </router-link>
           </li>
           <li class="menu-item" :class="{ active: isActive('/messages') }">
             <router-link to="/messages">
-              <i class="fas fa-comments"></i>
+              <i class="fas fa-envelope-open-text"></i>
               <span>Messages</span>
               <span class="menu-badge">5</span>
             </router-link>
           </li>
           <li class="menu-item" :class="{ active: isActive('/settings') }">
             <router-link to="/settings">
-              <i class="fas fa-cog"></i>
+              <i class="fas fa-sliders-h"></i>
               <span>Settings</span>
             </router-link>
           </li>
@@ -78,6 +78,7 @@
 <style scoped>
 /* Sidebar styles */
 .sidebar {
+font-family: 'Cal Sans', sans-serif;
   width: 260px;
   background: rgba(255, 255, 255, 0.05);
   backdrop-filter: blur(10px);

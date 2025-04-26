@@ -188,7 +188,7 @@
     overflow-x: hidden;
     background: linear-gradient(135deg, #2980b9, #6dd5fa);
     color: #fff;
-    font-family: 'Roboto', sans-serif;
+    font-family: 'Cal Sans', sans-serif;
     position: relative;
   }
   

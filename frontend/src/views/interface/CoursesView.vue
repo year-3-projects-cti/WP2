@@ -79,7 +79,7 @@
             </div>
             <div class="form-group">
               <label>Start Hour</label>
-              <input v-model="newCourse.hours" type="number" placeholder="Hour" min="1" required />
+              <input v-model="newCourse.hours" type="number" placeholder="Hourgi" min="1" required />
             </div>
             <div class="form-group">
   <label>Day of the Week (1=Monday, 7=Sunday)</label>
@@ -365,7 +365,7 @@
     overflow-x: hidden;
     background: linear-gradient(135deg, #2980b9, #6dd5fa);
     color: #fff;
-    font-family: 'Roboto', sans-serif;
+    font-family: 'Cal Sans', sans-serif;
     position: relative;
   }
   
