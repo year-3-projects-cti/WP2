@@ -23,10 +23,10 @@
               <span>Teachers</span>
             </router-link>
           </li>
-          <li class="menu-item" :class="{ active: isActive('/classes') }">
-            <router-link to="/classes">
+          <li class="menu-item" :class="{ active: isActive('/courses') }">
+            <router-link to="/courses">
               <i class="fas fa-chalkboard"></i>
-              <span>Classes</span>
+              <span>Courses</span>
             </router-link>
           </li>
           <li class="menu-item" :class="{ active: isActive('/calendar') }">
