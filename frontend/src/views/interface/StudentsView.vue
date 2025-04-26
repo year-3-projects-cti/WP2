@@ -1,6 +1,7 @@
 <template>
   <div class="dashboard-container">
     <div class="main-container">
+      <Sidebar />
       <main class="main-content">
         <div class="glass-panel">
           <h1 class="welcome-title">Students Management</h1>
@@ -91,6 +92,7 @@
 <script setup>
 import { ref, onMounted } from 'vue'
 import { useStudentsStore } from '@/stores/studentsStore'
+import Sidebar from '@/components/SideBar.vue'
 
 const studentsStore = useStudentsStore()
 
@@ -141,6 +143,7 @@ const cancelEdit = () => {
 onMounted(fetchStudents)
 </script>  
   <style scoped>
+  
   .students-table {
     width: 100%;
     border-collapse: collapse;
@@ -193,15 +196,19 @@ onMounted(fetchStudents)
 
 /* Main container styles */
 .main-container {
-  padding: 20px;
+  display: flex;
+  min-height: 100vh;
   position: relative;
   z-index: 1;
 }
 
 .main-content {
+  flex: 1;
+  padding: 30px;
   max-width: 1200px;
   margin: 0 auto;
   position: relative;
+  overflow-y: auto;
 }
 
 /* Glass effect styles */

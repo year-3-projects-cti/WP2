@@ -33,7 +33,8 @@
       </header>
   
       <div class="main-container">
-        <!-- Sidebar -->
+        <Sidebar />
+        <!-- Sidebar
         <aside class="sidebar">
           <nav>
             <div class="sidebar-header">
@@ -97,7 +98,7 @@
               </li>
             </ul>
           </nav>
-        </aside>
+        </aside> -->
   
         <!-- Main content -->
         <main class="main-content">
@@ -217,6 +218,7 @@
   <script setup>
   import { ref, onMounted, computed } from 'vue'
   import { useStudentsStore } from '@/stores/studentsStore'
+  import Sidebar from '@/components/SideBar.vue'
 
   const studentsStore = useStudentsStore()
 

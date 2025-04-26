@@ -1,6 +1,7 @@
 <template>
     <div class="dashboard-container">
       <div class="main-container">
+        <Sidebar />
         <main class="main-content">
           <div class="glass-panel">
             <h1 class="welcome-title">Teachers Management</h1>
@@ -90,6 +91,7 @@
   <script setup>
   import { ref, onMounted } from 'vue'
   import { useTeachersStore } from '@/stores/teachersStore'
+  import Sidebar from '@/components/SideBar.vue'
   
   const teachersStore = useTeachersStore()
   
@@ -192,15 +194,19 @@
   
   /* Main container styles */
   .main-container {
-    padding: 20px;
-    position: relative;
-    z-index: 1;
+    display: flex;
+  min-height: 100vh;
+  position: relative;
+  z-index: 1;
   }
   
   .main-content {
-    max-width: 1200px;
-    margin: 0 auto;
-    position: relative;
+    flex: 1;
+  padding: 30px;
+  max-width: 1200px;
+  margin: 0 auto;
+  position: relative;
+  overflow-y: auto;
   }
   
   /* Glass effect styles */

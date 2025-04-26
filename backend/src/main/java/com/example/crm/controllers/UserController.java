@@ -29,6 +29,4 @@ public class UserController {
     public User login(@RequestBody User loginRequest) {
         return userService.login(loginRequest.getEmail(), loginRequest.getPassword());
     }
-    
-
 }
