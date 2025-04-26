@@ -1,5 +1,6 @@
 <template>
     <div class="dashboard-container">
+      <InterfaceNav />
       <div class="main-container">
         <Sidebar />
         <main class="main-content">
@@ -191,6 +192,7 @@
   <script setup>
   import { ref, onMounted } from 'vue';
     import Sidebar from '@/components/SideBar.vue';
+    import InterfaceNav from '@/components/InterfaceNav.vue';
 
     function dayName(dayNumber) {
   const days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];

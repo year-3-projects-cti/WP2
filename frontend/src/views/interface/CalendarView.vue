@@ -1,5 +1,6 @@
 <template>
   <div class="dashboard-container">
+    <InterfaceNav />
     <div class="main-container">
       <Sidebar />
       <main class="main-content">
@@ -64,6 +65,7 @@
 <script setup>
 import { ref, computed, onMounted } from 'vue'
 import Sidebar from '@/components/SideBar.vue'
+import InterfaceNav from '@/components/InterfaceNav.vue'
 
 // Date management
 const today = new Date()

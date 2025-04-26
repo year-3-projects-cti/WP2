@@ -1,6 +1,8 @@
 <template>
   <div class="dashboard-container">
+    <InterfaceNav />
     <div class="main-container">
+      
       <Sidebar />
       <main class="main-content">
         <div class="glass-panel">
@@ -93,6 +95,7 @@
 import { ref, onMounted } from 'vue'
 import { useStudentsStore } from '@/stores/studentsStore'
 import Sidebar from '@/components/SideBar.vue'
+import InterfaceNav from '@/components/InterfaceNav.vue'
 
 const studentsStore = useStudentsStore()
 

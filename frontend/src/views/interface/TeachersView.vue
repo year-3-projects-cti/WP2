@@ -1,5 +1,6 @@
 <template>
     <div class="dashboard-container">
+      <InterfaceNav />
       <div class="main-container">
         <Sidebar />
         <main class="main-content">
@@ -92,6 +93,7 @@
   import { ref, onMounted } from 'vue'
   import { useTeachersStore } from '@/stores/teachersStore'
   import Sidebar from '@/components/SideBar.vue'
+  import InterfaceNav from '@/components/InterfaceNav.vue'
   
   const teachersStore = useTeachersStore()
   
