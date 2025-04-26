@@ -4,6 +4,7 @@ import UserLogInView from "@/views/auth/UserLogInView.vue";
 import UserRegisterView from "@/views/auth/UserRegisterView.vue";
 import InterfaceView from "@/views/interface/InterfaceView.vue";
 import StudentsView from "@/views/interface/StudentsView.vue";
+import TeachersView from "@/views/interface/TeachersView.vue";
 import { useAuthStore } from "@/stores/useAuthStore";
 
 const routes = [
@@ -12,6 +13,8 @@ const routes = [
   { path: "/register", component: UserRegisterView },
   { path: "/interface", component: InterfaceView, meta: { requiresAuth: true } },
   { path: "/students", component: StudentsView, meta: { requiresAuth: true } },
+  { path: "/teachers", component: TeachersView, meta: { requiresAuth: true } },
+
 ];
 
 const router = createRouter({
