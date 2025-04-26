@@ -18,11 +18,17 @@
             <i class="fas fa-bell"></i>
             <span class="notification-badge">3</span>
           </button>
-          <div class="user-profile">
+          <!-- User Profile -->
+        <!-- User Profile -->
+        <div v-if="usersStore.user" class="user-profile">
             <img src="" alt="Profile" class="user-avatar" />
-            <span class="user-name">{{ user.name }}</span>
+            <span class="user-name">{{ usersStore.user.name }}</span>
+            <span class="user-role">{{ usersStore.user.role }}</span>
             <i class="fas fa-chevron-down"></i>
-          </div>
+        </div>
+          <button @click="handleLogout" class="logout-btn">
+            Logout
+            </button>
         </div>
       </header>
   
@@ -98,7 +104,9 @@
           <div class="content-wrapper">
             <!-- Welcome section -->
             <section class="welcome-panel glass-panel">
-              <h1 class="welcome-title">Welcome, {{ user.name }}</h1>
+                <h1 v-if="usersStore.user" class="welcome-title">
+  Welcome, {{ usersStore.user.name }}
+</h1>
               <p class="welcome-subtitle">Here is an overview of your day</p>
   
               <div class="stats-container">
@@ -208,11 +216,18 @@
   
   <script setup>
   import { ref } from 'vue'
-  
-  const user = ref({
-    name: 'John Smith',
-    role: 'Administrator'
-  })
+  import { useAuthStore } from "@/stores/useAuthStore";
+import { useRouter } from "vue-router";
+import { onMounted } from 'vue'
+import { useUsersStore } from '@/stores/usersStore'
+
+const authStore = useAuthStore();
+const router = useRouter();
+const usersStore = useUsersStore()
+
+onMounted(() => {
+  usersStore.fetchUser()
+})
   
   const hours = ref([8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18])
   
@@ -276,6 +291,11 @@
     }
     return icons[type] || 'fas fa-bell'
   }
+
+  function handleLogout() {
+  authStore.logout();
+  router.push("/login");
+}
   </script>
   
   
@@ -417,6 +437,23 @@
     align-items: center;
     gap: 20px;
   }
+
+  .logout-btn {
+  background: rgba(255, 255, 255, 0.1);
+  border: none;
+  padding: 10px 20px;
+  border-radius: 50px;
+  font-size: 16px;
+  color: white;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  backdrop-filter: blur(5px);
+  -webkit-backdrop-filter: blur(5px);
+}
+
+.logout-btn:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
   
   .notification-btn {
     background: rgba(255, 255, 255, 0.1);

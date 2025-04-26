@@ -22,6 +22,7 @@ export default defineConfig({
         target: 'http://crm_backend:8080',
         changeOrigin: true,
         secure: false,
+        ws: true,
       }
     }
   }
