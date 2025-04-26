@@ -207,24 +207,27 @@
   </template>
   
   <script setup>
-  import { ref } from 'vue'
-  
+  import { ref, onMounted, computed } from 'vue'
+  import { useStudentsStore } from '@/stores/studentsStore'
+
+  const studentsStore = useStudentsStore()
+
   const user = ref({
     name: 'John Smith',
     role: 'Administrator'
   })
-  
+
   const hours = ref([8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18])
-  
+
   const currentDate = ref('April 26, 2025')
-  
+
   const todayEvents = ref([
     { id: 1, title: 'Mathematics', startHour: 9, startMinute: 0, duration: 1.5, location: 'Room A102', teacher: 'Mary Laurent', seatsTotal: 25, seatsOccupied: 22, status: 'past' },
     { id: 2, title: 'Physics', startHour: 11, startMinute: 0, duration: 2, location: 'Room B201', teacher: 'Peter Martin', seatsTotal: 20, seatsOccupied: 20, status: 'current' },
     { id: 3, title: 'English', startHour: 14, startMinute: 30, duration: 1.5, location: 'Room C305', teacher: 'Sophie White', seatsTotal: 15, seatsOccupied: 12, status: 'upcoming' },
     { id: 4, title: 'Computer Science', startHour: 16, startMinute: 15, duration: 2, location: 'Room D110', teacher: 'Thomas Black', seatsTotal: 18, seatsOccupied: 15, status: 'upcoming' }
   ])
-  
+
   const recentActivities = ref([
     { id: 1, type: 'student', description: 'New student registered: Emma Small', time: '10 minutes ago' },
     { id: 2, type: 'class', description: '"Advanced Chemistry" course added to schedule', time: '35 minutes ago' },
@@ -232,20 +235,24 @@
     { id: 4, type: 'message', description: 'New message from Prof. Dubois', time: '3 hours ago' },
     { id: 5, type: 'admin', description: 'System update completed', time: '5 hours ago' }
   ])
-  
+
   const notifications = ref([
     { id: 1, type: 'alert', message: 'Teachers meeting tomorrow at 2:00 PM', time: '20 minutes ago', read: false },
     { id: 2, type: 'info', message: 'New shared document: "Second Trimester Schedule"', time: '1 hour ago', read: false },
     { id: 3, type: 'reminder', message: 'Exam registration deadline: April 28', time: '3 hours ago', read: false },
     { id: 4, type: 'message', message: 'New message from Mary Laurent', time: 'Yesterday', read: true }
   ])
-  
-  const stats = ref([
-    { title: 'Students', value: 342, icon: 'fas fa-user-graduate' },
+
+  const stats = computed(() => [
+    { title: 'Students', value: studentsStore.students.length, icon: 'fas fa-user-graduate' },
     { title: 'Active Classes', value: 24, icon: 'fas fa-chalkboard' },
     { title: 'Courses Today', value: 8, icon: 'fas fa-calendar-check' },
     { title: 'New Messages', value: 5, icon: 'fas fa-envelope' }
   ])
+
+  onMounted(async () => {
+    await studentsStore.fetchStudents()
+  })
   
   function formatEventTime(event) {
     const startHour = event.startHour.toString().padStart(2, '0')
