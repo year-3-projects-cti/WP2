@@ -6,25 +6,27 @@
         <div class="glass-panel">
           <h1 class="welcome-title">Course Calendar</h1>
 
-          <!-- Calendar Controls -->
+          <!-- Controls -->
           <section class="glass-panel calendar-controls-panel">
             <div class="calendar-controls">
               <button class="btn-details" @click="prevWeek">Previous Week</button>
-              <h2>{{ formatDateRange(currentWeekStart, currentWeekEnd) }}</h2>
+              <h2>{{ currentWeekRange }}</h2>
               <button class="btn-details" @click="nextWeek">Next Week</button>
             </div>
           </section>
 
-          <!-- Calendar Grid -->
-          <section class="glass-panel calendar-grid-panel">
+          <div v-if="loading" class="loading-overlay">
+            <div class="spinner"></div>
+          </div>
+
+          <!-- Calendar -->
+          <section v-else class="glass-panel calendar-grid-panel">
             <div class="calendar-container">
               <div class="time-labels">
                 <div class="time-label header-spacer"></div>
-                <div class="time-label" v-for="hour in hours" :key="hour">
-                  {{ hour }}:00
-                </div>
+                <div class="time-label" v-for="hour in hours" :key="hour">{{ hour }}:00</div>
               </div>
-              
+
               <div class="weekday-grid">
                 <div class="weekday-column" v-for="(day, index) in weekdays" :key="index">
                   <div class="weekday-header">
@@ -32,29 +34,26 @@
                     <div class="day-date">{{ formatDate(addDays(currentWeekStart, index)) }}</div>
                   </div>
                   <div class="day-slots">
-                    <div 
-                      class="time-slot" 
-                      v-for="hour in hours" 
-                      :key="`${index}-${hour}`"
-                    >
+                    <div class="time-slot" v-for="hour in hours" :key="`${index}-${hour}`">
                       <div 
                         v-for="course in getCoursesForDayAndHour(index, hour)" 
                         :key="course.id"
                         class="course-item"
                         :class="getCourseStatusClass(course.status)"
                       >
-                        <div class="course-title">{{ course.title }}</div>
+                        <div class="course-title">{{ course.name }}</div>
                         <div class="course-details">
-                          <span>{{ course.teacher }}</span>
-                          <span>{{ course.location }}</span>
+                          <span>{{ findTeacherName(course.teacherId) }}</span>
                         </div>
                       </div>
                     </div>
                   </div>
                 </div>
               </div>
+
             </div>
           </section>
+
         </div>
       </main>
     </div>
@@ -63,98 +62,10 @@
 
 <script setup>
 import { ref, computed, onMounted } from 'vue'
+import axios from 'axios'
 import Sidebar from '@/components/SideBar.vue'
 
-// Date management
-const today = new Date()
-const currentWeekStart = ref(getWeekStart(today))
-const currentWeekEnd = computed(() => {
-  const end = new Date(currentWeekStart.value)
-  end.setDate(end.getDate() + 6)
-  return end
-})
-
-// Time slots configuration
-const hours = ref([8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19])
-const weekdays = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]
-
-// Sample courses data
-const courses = ref([
-  {
-    id: 1,
-    title: "Mathematics",
-    day: 0, // Monday
-    hour: 9,
-    teacher: "Prof. Johnson",
-    location: "Room A101",
-    status: "active"
-  },
-  {
-    id: 2,
-    title: "Physics",
-    day: 1, // Tuesday
-    hour: 11,
-    teacher: "Dr. Smith",
-    location: "Lab B203",
-    status: "active"
-  },
-  {
-    id: 3,
-    title: "Literature",
-    day: 2, // Wednesday
-    hour: 14,
-    teacher: "Mrs. Davis",
-    location: "Room C305",
-    status: "cancelled"
-  },
-  {
-    id: 4,
-    title: "Computer Science",
-    day: 0, // Monday
-    hour: 15,
-    teacher: "Mr. Wilson",
-    location: "Lab D401",
-    status: "active"
-  },
-  {
-    id: 5,
-    title: "History",
-    day: 3, // Thursday
-    hour: 10,
-    teacher: "Dr. Brown",
-    location: "Room E102",
-    status: "active"
-  },
-  {
-    id: 6,
-    title: "Chemistry",
-    day: 4, // Friday
-    hour: 13,
-    teacher: "Prof. Taylor",
-    location: "Lab F204",
-    status: "active"
-  },
-  {
-    id: 7,
-    title: "Art",
-    day: 5, // Saturday
-    hour: 16,
-    teacher: "Ms. Martinez",
-    location: "Studio G306",
-    status: "active"
-  },
-  {
-    id: 8,
-    title: "Physical Education",
-    day: 6, // Sunday
-    hour: 9,
-    teacher: "Coach Anderson",
-    location: "Gym H101",
-    status: "cancelled"
-  }
-])
-
-// Helper functions
+// Helpers
 function getWeekStart(date) {
   const result = new Date(date)
   const day = result.getDay()
@@ -173,12 +84,138 @@ function formatDate(date) {
   return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })
 }
 
-function formatDateRange(start, end) {
-  const startStr = start.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })
-  const endStr = end.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
+// State
+const today = new Date()
+const currentWeekStart = ref(getWeekStart(today))
+const hours = ref([8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19])
+const weekdays = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]
+const courses = ref([])
+const loading = ref(false)
+const teachers = ref([])
+
+// Computed
+const currentWeekEnd = computed(() => {
+  const end = new Date(currentWeekStart.value)
+  end.setDate(end.getDate() + 6)
+  return end
+})
+
+const currentWeekRange = computed(() => {
+  const startStr = currentWeekStart.value.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })
+  const endStr = currentWeekEnd.value.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
   return `${startStr} - ${endStr}`
+})
+
+// Helper function to get day index (0 = Monday, 6 = Sunday)
+function getDayIndex(date) {
+  const day = date.getDay()
+  return day === 0 ? 6 : day - 1 // Convert Sunday (0) to 6, and shift others (1-6) to 0-5
 }
 
+// Fetch courses for week
+async function fetchCoursesForWeek() {
+  loading.value = true
+  try {
+    const startStr = formatBackendDate(currentWeekStart.value)
+    const endStr = formatBackendDate(currentWeekEnd.value)
+
+    const response = await axios.get('http://localhost:8080/api/courses/between', {
+      params: { start: startStr, end: endStr }
+    })
+
+    // Process one-time courses
+    const oneTimeCourses = response.data.oneTimeCourses.map(course => {
+      const courseDate = new Date(course.startDateTime)
+      return {
+        id: course.id,
+        name: course.name,
+        day: getDayIndex(courseDate), // Convert to day index (0-6)
+        hour: courseDate.getHours(),
+        status: course.status || 'active',
+        teacherId: course.teacher // API uses "teacher" not "teacherId"
+      }
+    })
+
+    // Process recurrent courses
+    const recurrentCourses = response.data.recurrentCourses.flatMap(course => {
+      return generateRecurrentSessionsForWeek(course)
+    })
+
+    courses.value = [...oneTimeCourses, ...recurrentCourses]
+
+  } catch (error) {
+    console.error('Failed to fetch courses:', error)
+  } finally {
+    loading.value = false
+  }
+}
+
+// Extra helpers
+function formatBackendDate(date) {
+  return `${date.getDate().toString().padStart(2, '0')}.${(date.getMonth() + 1).toString().padStart(2, '0')}.${date.getFullYear()} 00:00`
+}
+
+function generateRecurrentSessionsForWeek(course) {
+  const sessions = []
+  
+  // Map day names to indices (0 = Monday, 6 = Sunday)
+  const dayMapping = {
+    'MONDAY': 0,
+    'TUESDAY': 1, 
+    'WEDNESDAY': 2,
+    'THURSDAY': 3,
+    'FRIDAY': 4,
+    'SATURDAY': 5,
+    'SUNDAY': 6
+  }
+  
+  const dayIndex = dayMapping[course.dayOfWeek]
+  if (dayIndex !== undefined) {
+    // Extract hour from time string (format: "HH:MM:SS")
+    const hour = parseInt(course.startTime.split(':')[0])
+    
+    sessions.push({
+      id: `${course.id}-${dayIndex}`,
+      name: course.name,
+      day: dayIndex,
+      hour: hour,
+      status: course.status || 'active',
+      teacherId: course.teacher // API uses "teacher" not "teacherId"
+    })
+  }
+  
+  return sessions
+}
+
+// Find teacher
+function findTeacherName(id) {
+  const teacher = teachers.value.find(t => t.id === id)
+  return teacher ? teacher.name : 'Unknown'
+}
+
+// Navigation
+function nextWeek() {
+  const newStart = new Date(currentWeekStart.value)
+  newStart.setDate(newStart.getDate() + 7)
+  currentWeekStart.value = newStart
+  fetchCoursesForWeek()
+}
+
+function prevWeek() {
+  const newStart = new Date(currentWeekStart.value)
+  newStart.setDate(newStart.getDate() - 7)
+  currentWeekStart.value = newStart
+  fetchCoursesForWeek()
+}
+
+// Init
+onMounted(async () => {
+  await fetchCoursesForWeek()
+  const response = await axios.get('http://localhost:8080/api/teachers')
+  teachers.value = response.data
+})
+
+// Filters
 function getCoursesForDayAndHour(day, hour) {
   return courses.value.filter(course => course.day === day && course.hour === hour)
 }
@@ -189,24 +226,6 @@ function getCourseStatusClass(status) {
     'course-cancelled': status === 'cancelled'
   }
 }
-
-// Navigation functions
-function nextWeek() {
-  const newStart = new Date(currentWeekStart.value)
-  newStart.setDate(newStart.getDate() + 7)
-  currentWeekStart.value = newStart
-}
-
-function prevWeek() {
-  const newStart = new Date(currentWeekStart.value)
-  newStart.setDate(newStart.getDate() - 7)
-  currentWeekStart.value = newStart
-}
-
-onMounted(() => {
-  // You would typically load courses from your API here
-  console.log('Calendar component mounted')
-})
 </script>
 
 <style scoped>
@@ -459,4 +478,33 @@ h2 {
     border-bottom: none;
   }
 }
+
+.loading-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(41, 128, 185, 0.7);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 10;
+  backdrop-filter: blur(5px);
+}
+
+.spinner {
+  border: 6px solid rgba(255, 255, 255, 0.3);
+  border-top: 6px solid white;
+  border-radius: 50%;
+  width: 60px;
+  height: 60px;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
 </style>
