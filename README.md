@@ -17,6 +17,8 @@ This project is a Customer Relationship Management (CRM) system specifically des
 
 ## 📖 Functional Requirements
 
+### Trello board: https://trello.com/b/cNMlIUxQ/crm-backlog-sprint-board
+
 - **User Story 1**: Student Enrollment
 
 As an administrative staff member,
