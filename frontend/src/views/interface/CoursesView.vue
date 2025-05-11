@@ -1,364 +1,256 @@
 <template>
-    <div class="dashboard-container">
-      <InterfaceNav />
+  <div class="dashboard-container">
+    <InterfaceNav />
       <div class="main-container">
-        <Sidebar />
-        <main class="main-content">
-          <div class="glass-panel">
-            <h1 class="welcome-title">Course Management</h1>
-            
-            <!-- Add Course Button -->
-            <div class="add-course-container">
-              <button class="btn-add-course" @click="showAddCourseModal = true">
-                <span class="plus-icon">+</span> Add Course
-              </button>
-            </div>
-            
-            <!-- Course Cards Container -->
-            <div class="courses-grid">
-              <div v-for="course in courses" :key="course.id" class="course-card glass-panel">
-                <div class="course-image">
-                  <img :src="course.imageUrl" :alt="course.name">
-                </div>
-                <div class="course-content">
-                  <h3 class="course-title">{{ course.name }}</h3>
-                  <div class="course-details">
-                    <div class="detail-item">
-                      <span class="detail-icon">⏰</span>
-                      <span class="detail-text">{{ course.hours }} hours</span>
-                    </div>
-                    <div class="detail-item">
-                      <span class="detail-icon">👨‍🏫</span>
-                      <span class="detail-text">{{ course.teacher }}</span>
-                    </div>
-                    <div class="course-details">
-  <div class="detail-item">
-    <span class="detail-icon">🏫</span>
-    <span class="detail-text">{{ course.classroom }}</span>
-  </div>
-  <div class="detail-item">
-    <span class="detail-icon">📅</span>
-    <span class="detail-text">{{ dayName(course.day) }}</span> <!-- transformare număr în nume zi -->
-  </div>
-  <div class="detail-item">
-    <span class="detail-icon">🔔</span>
-    <span class="detail-text">{{ course.status }}</span>
-  </div>
-</div>
-                  </div>
-                  <div class="course-students">
-                    <div class="students-label">Students:</div>
-                    <div class="students-list">
-                      <span v-for="(student, index) in course.students" :key="index" class="student-badge">
-                        {{ student }}
-                      </span>
-                    </div>
-                  </div>
-                  <div class="card-actions">
-                    <button class="btn-details" @click="editCourse(course)">Edit</button>
-                    <button class="btn-join" @click="deleteCourse(course.id)">Delete</button>
-                  </div>
-                </div>
-              </div>
-            </div>
+      <Sidebar />
+      <main class="main-content">
+        <div class="glass-panel">
+          <h1 class="welcome-title">Course Management</h1>
+          <div class="add-course-container">
+            <button class="btn-add-course" @click="showAddCourseModal = true">
+              <span class="plus-icon">+</span> Add Course
+            </button>
           </div>
-        </main>
+          <div v-if="teachers.length > 0">
+  <div class="courses-grid">
+    <div v-for="course in courses" :key="course.id" class="course-card glass-panel">
+      <div class="course-image">
+        <img :src="course.imageUrl" :alt="course.name">
       </div>
-      
-      <!-- Add Course Modal -->
-      <div class="modal-overlay" v-if="showAddCourseModal" @click.self="showAddCourseModal = false">
-        <div class="modal-content glass-panel">
-          <h2>Add New Course</h2>
-          <form @submit.prevent="addCourse">
-            <div class="form-group">
-              <label>Course Image URL</label>
-              <input v-model="newCourse.imageUrl" type="text" placeholder="Image URL" required />
-            </div>
-            <div class="form-group">
-              <label>Course Name</label>
-              <input v-model="newCourse.name" type="text" placeholder="Course Name" required />
-            </div>
-            <div class="form-group">
-              <label>Start Hour</label>
-              <input v-model="newCourse.hours" type="number" placeholder="Hourgi" min="1" required />
-            </div>
-            <div class="form-group">
-  <label>Day of the Week (1=Monday, 7=Sunday)</label>
-  <input v-model="newCourse.day" type="number" min="1" max="7" placeholder="Enter day (1-7)" />
-</div>
-<div class="form-group">
-  <label>Status</label>
-  <select v-model="newCourse.status" required>
-    <option value="active">Active</option>
-    <option value="canceled">Canceled</option>
-  </select>
-</div>
-            <div class="form-group">
-            <label>Classroom / Location</label>
-            <input v-model="newCourse.classroom" type="text" placeholder="e.g. Room A101" />
-            </div>
-            <div class="form-group">
-              <label>Assign Teacher</label>
-              <select v-model="newCourse.teacher" required>
-                <option value="" disabled>Select Teacher</option>
-                <option v-for="teacher in teachers" :key="teacher">{{ teacher }}</option>
-              </select>
-            </div>
-            <div class="form-group">
-              <label>Assign Students</label>
-              <div class="student-selection">
-                <div v-for="student in availableStudents" :key="student" class="student-checkbox">
-                  <input 
-                    type="checkbox" 
-                    :id="'student-' + student"
-                    :value="student"
-                    v-model="newCourse.students"
-                  />
-                  <label :for="'student-' + student">{{ student }}</label>
-                </div>
-              </div>
-            </div>
-            <div class="modal-actions">
-              <button class="btn-details" type="button" @click="showAddCourseModal = false">Cancel</button>
-              <button class="btn-join" type="submit">Add Course</button>
-            </div>
-          </form>
-        </div>
-      </div>
-      
-      <!-- Edit Course Modal -->
-      <div class="modal-overlay" v-if="showEditCourseModal" @click.self="showEditCourseModal = false">
-        <div class="modal-content glass-panel">
-          <h2>Edit Course</h2>
-          <form @submit.prevent="updateCourse">
-            <div class="form-group">
-              <label>Course Image URL</label>
-              <input v-model="editingCourse.imageUrl" type="text" placeholder="Image URL" required />
-            </div>
-            <div class="form-group">
-              <label>Course Name</label>
-              <input v-model="editingCourse.name" type="text" placeholder="Course Name" required />
-            </div>
-            <div class="form-group">
-              <label>Course Hours</label>
-              <input v-model="editingCourse.hours" type="number" placeholder="Hours" min="1" required />
-            </div>
-            <div class="form-group">
-            <label>Classroom / Location</label>
-            <input v-model="editingCourse.classroom" type="text" placeholder="e.g. Room A101" />
-            </div>
-            <div class="form-group">
-  <label>Day of the Week (1=Monday, 7=Sunday)</label>
-  <input v-model="editingCourse.day" type="number" min="1" max="7" placeholder="Enter day (1-7)" />
-    </div>
-<div class="form-group">
-  <label>Status</label>
-  <select v-model="newCourse.status" required>
-    <option value="active">Active</option>
-    <option value="canceled">Canceled</option>
-  </select>
-</div>
-            <div class="form-group">
-              <label>Assign Teacher</label>
-              <select v-model="editingCourse.teacher" required>
-                <option value="" disabled>Select Teacher</option>
-                <option v-for="teacher in teachers" :key="teacher">{{ teacher }}</option>
-              </select>
-            </div>
-            <div class="form-group">
-              <label>Assign Students</label>
-              <div class="student-selection">
-                <div v-for="student in availableStudents" :key="student" class="student-checkbox">
-                  <input 
-                    type="checkbox" 
-                    :id="'edit-student-' + student"
-                    :value="student"
-                    v-model="editingCourse.students"
-                  />
-                  <label :for="'edit-student-' + student">{{ student }}</label>
-                </div>
-              </div>
-            </div>
-            <div class="modal-actions">
-              <button class="btn-details" type="button" @click="showEditCourseModal = false">Cancel</button>
-              <button class="btn-join" type="submit">Save Changes</button>
-            </div>
-          </form>
+      <div class="course-content">
+        <h3 class="course-title">{{ course.name }}</h3>
+        <div class="course-details">
+          <div class="detail-item">
+            <span class="detail-icon">⏰</span><span class="detail-text">{{ course.hours }} hours</span>
+          </div>
+          <div class="detail-item">
+            <span class="detail-icon">👨‍🏫</span><span class="detail-text">{{ findTeacherName(course.teacherId) }}</span>
+          </div>
+          <div class="detail-item">
+            <span class="detail-icon">🔄</span><span class="detail-text">{{ course.type }}</span>
+          </div>
         </div>
       </div>
     </div>
-  </template>
-  
-  <script setup>
-  import { ref, onMounted } from 'vue';
-    import Sidebar from '@/components/SideBar.vue';
-    import InterfaceNav from '@/components/InterfaceNav.vue';
+  </div>
+</div>
 
-    function dayName(dayNumber) {
-  const days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
-  return days[dayNumber - 1] || 'Unknown';
+        </div>
+      </main>
+    </div>
+
+    <div class="modal-overlay" v-if="showAddCourseModal" @click.self="showAddCourseModal = false">
+  <div class="modal-content glass-panel">
+    <h2>Add New Course</h2>
+    <form @submit.prevent="addCourse">
+      <div class="form-group">
+        <label>Course Name</label>
+        <input v-model="newCourse.name" type="text" placeholder="Course Name" required />
+      </div>
+
+      <div class="form-group">
+        <label>Course Image URL</label>
+        <input v-model="newCourse.imageUrl" type="text" placeholder="Image URL" required />
+      </div>
+
+      <div class="form-group">
+        <label>Course Type</label>
+        <select v-model="newCourse.type" required>
+          <option value="one-time">One-Time</option>
+          <option value="recurrent">Recurrent</option>
+        </select>
+      </div>
+
+      <div class="form-group" v-if="newCourse.type === 'one-time'">
+        <label>Session Start Date</label>
+        <input v-model="newCourse.startDate" type="date" required />
+      </div>
+
+      <div class="form-group" v-if="newCourse.type === 'one-time'">
+        <label>Start Hour</label>
+        <input v-model="newCourse.startHour" type="time" required />
+      </div>
+
+      <div class="form-group" v-if="newCourse.type === 'recurrent'">
+        <label>Day of the Week</label>
+        <select v-model="newCourse.dayOfWeek" required>
+          <option disabled value="">Select day</option>
+          <option value="MONDAY">Monday</option>
+          <option value="TUESDAY">Tuesday</option>
+          <option value="WEDNESDAY">Wednesday</option>
+          <option value="THURSDAY">Thursday</option>
+          <option value="FRIDAY">Friday</option>
+          <option value="SATURDAY">Saturday</option>
+          <option value="SUNDAY">Sunday</option>
+        </select>
+      </div>
+
+      <div class="form-group" v-if="newCourse.type === 'recurrent'">
+        <label>Start Hour</label>
+        <input v-model="newCourse.startHour" type="time" required />
+      </div>
+
+      <div class="form-group">
+        <label>Classroom (optional)</label>
+        <input v-model="newCourse.classroom" type="text" placeholder="Enter classroom name" />
+      </div>
+
+      <div class="form-group">
+        <label>Assign Teacher</label>
+        <select v-model="newCourse.teacherId" required>
+          <option value="" disabled>Select Teacher</option>
+          <option v-for="teacher in teachers" :key="teacher.id" :value="teacher.id">{{ teacher.name }}</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label>Assign Students</label>
+        <div class="student-selection">
+          <div v-for="student in students" :key="student.id" class="student-checkbox">
+            <input type="checkbox" :id="'student-' + student.id" :value="student.id" v-model="newCourse.students" />
+            <label :for="'student-' + student.id">{{ student.name }}</label>
+          </div>
+        </div>
+      </div>
+
+      <div class="modal-actions">
+        <button class="btn-details" type="button" @click="showAddCourseModal = false">Cancel</button>
+        <button class="btn-join" type="submit">Add Course</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+
+  </div>
+</template>
+
+<script setup>
+import { ref, onMounted } from 'vue'
+import axios from 'axios'
+import Sidebar from '@/components/SideBar.vue'
+import InterfaceNav from '@/components/InterfaceNav.vue';
+
+
+// Data
+const teachers = ref([])
+const students = ref([])
+const courses = ref([])
+
+const showAddCourseModal = ref(false)
+
+const newCourse = ref({
+  name: '',
+  startHour: null,
+  hours: null,
+  startDate: '',
+  type: 'one-time',
+  teacherId: '',
+  students: [],
+  imageUrl: '',
+})
+
+const isTeachersLoaded = ref(false);
+
+const fetchTeachers = async () => {
+  try {
+    const response = await axios.get('http://localhost:8080/api/teachers');
+    teachers.value = response.data;
+    isTeachersLoaded.value = true;
+    console.log('Fetched teachers:', teachers.value);
+  } catch (error) {
+    console.error('Failed to fetch teachers:', error);
+  }
+};
+
+const fetchCourses = async () => {
+  if (!isTeachersLoaded.value) {
+    console.log('Waiting for teachers to be loaded...');
+    return;
+  }
+
+  try {
+    const response = await axios.get('http://localhost:8080/api/courses');
+    const oneTime = response.data.oneTimeCourses.map(c => ({ ...c, type: 'one-time' }));
+    const recurrent = response.data.recurrentCourses.map(c => ({ ...c, type: 'recurrent' }));
+    courses.value = [...oneTime, ...recurrent];
+  } catch (error) {
+    console.error('Failed to fetch courses:', error);
+  }
+};
+
+
+const fetchStudents = async () => {
+  const response = await axios.get('http://localhost:8080/api/students')
+  students.value = response.data
 }
-  
-  // Sample data (replace with API calls in production)
-  const teachers = ref([
-    'Prof. Smith',
-    'Dr. Johnson',
-    'Mrs. Williams',
-    'Mr. Brown',
-    'Ms. Davis'
-  ]);
-  
-  const availableStudents = ref([
-    'John Doe',
-    'Jane Smith',
-    'Mike Johnson',
-    'Sarah Williams',
-    'David Brown',
-    'Emily Davis',
-    'Alex Wilson',
-    'Olivia Martin',
-    'Ethan Thompson',
-    'Sophia Anderson'
-  ]);
-  
-  const courses = ref([
-    {
-      id: 1,
-      name: 'Introduction to Programming',
-      hours: 48,
-      teacher: 'Prof. Smith',
-      students: ['John Doe', 'Jane Smith', 'Mike Johnson'],
-      imageUrl: 'https://via.placeholder.com/300x200?text=Programming',
-      classroom: 'Room A101',
-      day: 4,                 // VINERI (4 = Friday)
-      status: 'active'  
-    },
-    {
-      id: 2,
-      name: 'Advanced Mathematics',
-      hours: 60,
-      teacher: 'Dr. Johnson',
-      students: ['Sarah Williams', 'David Brown', 'Emily Davis'],
-      imageUrl: 'https://via.placeholder.com/300x200?text=Mathematics',
-      classroom: 'Room A101',
-      day: 4,                 // VINERI (4 = Friday)
-      status: 'active' 
-    },
-    {
-      id: 3,
-      name: 'Data Science Fundamentals',
-      hours: 36,
-      teacher: 'Ms. Davis',
-      students: ['Alex Wilson', 'Olivia Martin', 'Ethan Thompson'],
-      imageUrl: 'https://via.placeholder.com/300x200?text=Data+Science',
-      classroom: 'Room A101',
-      day: 4,                 // VINERI (4 = Friday)
-      status: 'active'  
-    },
-    {
-      id: 4,
-      name: 'Web Development',
-      hours: 54,
-      teacher: 'Mr. Brown',
-      students: ['John Doe', 'Sophia Anderson', 'Mike Johnson'],
-      imageUrl: 'https://via.placeholder.com/300x200?text=Web+Development',
-      classroom: 'Room A101',
-      day: 4,                 // VINERI (4 = Friday)
-      status: 'active' 
-    },
-    {
-      id: 5,
-      name: 'Graphic Design',
-      hours: 42,
-      teacher: 'Mrs. Williams',
-      students: ['Jane Smith', 'Emily Davis', 'Olivia Martin'],
-      imageUrl: 'https://via.placeholder.com/300x200?text=Graphic+Design',
-      classroom: 'Room A101',
-      day: 4,                 // VINERI (4 = Friday)
-      status: 'active'  
+
+// Helpers
+const findTeacherName = (id) => {
+  if (!id) {
+    console.warn('Invalid teacher ID:', id);
+    return 'Unknown';  // Dacă nu există ID valid, returnează 'Unknown'
+  }
+  const teacher = teachers.value.find(t => t.id === id);
+  return teacher ? teacher.name : 'Unknown';
+}
+
+
+// Add course
+async function addCourse() {
+  try {
+    if (!newCourse.value.teacherId) {
+      alert('Please select a teacher');
+      return;
     }
-  ]);
-  
-  // State for modals and forms
-  const showAddCourseModal = ref(false);
-  const showEditCourseModal = ref(false);
-  const newCourse = ref({
-    name: '',
-    hours: null,
-    teacher: '',
-    students: [],
-    imageUrl: '',
-    classroom: '',
-    day: null,           // aici
-  status: 'active'   
-  });
-  
-  const editingCourse = ref({
-    id: null,
-    name: '',
-    hours: null,
-    teacher: '',
-    students: [],
-    imageUrl: '',
-    classroom: '',
-    day: null,           // aici
-  status: 'active'  
-  });
-  
-  // Functions
-  const addCourse = () => {
-    const courseId = courses.value.length > 0 ? Math.max(...courses.value.map(c => c.id)) + 1 : 1;
-    
-    courses.value.push({
-      id: courseId,
-      name: newCourse.value.name,
-      hours: newCourse.value.hours,
-        classroom: newCourse.value.classroom,
-        day: newCourse.value.day,
-        status: newCourse.value.status,
-      teacher: newCourse.value.teacher,
-      students: [...newCourse.value.students],
-      imageUrl: newCourse.value.imageUrl || 'https://via.placeholder.com/300x200?text=New+Course'
-    });
-    
-    // Reset form and close modal
-    newCourse.value = {
-      name: '',
-      hours: null,
-        classroom: '',
-        day: null,          
-        status: 'active',
-      teacher: '',
-      students: [],
-      imageUrl: ''
-    };
+    if (newCourse.value.type === "one-time") {
+      // Creăm un obiect Date folosind datele din input, fără să o convertească automat în UTC
+      const startDateTime = new Date(`${newCourse.value.startDate}T${newCourse.value.startHour}:00`);
+
+      // Ajustăm la ora locală înainte de a trimite
+      const localDateTime = new Date(startDateTime.getTime() - startDateTime.getTimezoneOffset() * 60000);
+
+      const payload = {
+        name: newCourse.value.name,
+        teacher: newCourse.value.teacherId,
+        classroom: newCourse.value.classroom || "Default Room",
+        imageUrl: newCourse.value.imageUrl,
+        startDateTime: localDateTime.toISOString(), // Trimit data în UTC, dar ajustată corect
+        status: "active",
+      };
+
+      await axios.post('http://localhost:8080/api/courses/one-time', payload);
+    } else if (newCourse.value.type === "recurrent") {
+      const payload = {
+        name: newCourse.value.name,
+        teacher: newCourse.value.teacherId,
+        classroom: newCourse.value.classroom || "Default Room",
+        imageUrl: newCourse.value.imageUrl,
+        dayOfWeek: newCourse.value.dayOfWeek,
+        startTime: newCourse.value.startHour,
+        status: "active",
+      };
+
+      await axios.post('http://localhost:8080/api/courses/recurrent', payload);
+    }
+
     showAddCourseModal.value = false;
-  };
-  
-  const editCourse = (course) => {
-    editingCourse.value = { ...course, students: [...course.students] };
-    showEditCourseModal.value = true;
-  };
-  
-  const updateCourse = () => {
-    const index = courses.value.findIndex(c => c.id === editingCourse.value.id);
-    if (index !== -1) {
-      courses.value[index] = { ...editingCourse.value };
-    }
-    showEditCourseModal.value = false;
-  };
-  
-  const deleteCourse = (id) => {
-    if (confirm('Are you sure you want to delete this course?')) {
-      courses.value = courses.value.filter(course => course.id !== id);
-    }
-  };
-  
-  onMounted(() => {
-    // You could fetch courses from an API here
-  });
-  </script>
-  
+    fetchCourses(); // reîncarcă lista de cursuri
+  } catch (error) {
+    console.error(error);
+  }
+}
+
+
+onMounted(async () => {
+  await fetchTeachers();
+  await fetchCourses();
+  fetchStudents();
+})
+
+</script>
+
+
   <style scoped>
   /* Base styles */
   .dashboard-container {

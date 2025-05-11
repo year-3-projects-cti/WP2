@@ -55,6 +55,12 @@ This project is a Customer Relationship Management (CRM) system specifically des
    - **Backend API**: `http://localhost:8080/api`
    - **Frontend UI**: `http://localhost:3000`
 
+### Restart Application after Backend Updates
+Run the following command
+```sh
+docker compose up --build -d
+```
+
 ### Stop the Application
 To stop all containers, run:
 ```sh
