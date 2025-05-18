@@ -129,8 +129,7 @@
 import { ref, onMounted } from 'vue'
 import axios from 'axios'
 import Sidebar from '@/components/SideBar.vue'
-import InterfaceNav from '@/components/InterfaceNav.vue';
-
+import InterfaceNav from '@/components/InterfaceNav.vue'
 
 // Data
 const teachers = ref([])
@@ -148,107 +147,98 @@ const newCourse = ref({
   teacherId: '',
   students: [],
   imageUrl: '',
+  classroom: ''
 })
-
-const isTeachersLoaded = ref(false);
 
 const fetchTeachers = async () => {
   try {
-    const response = await axios.get('http://localhost:8080/api/teachers');
-    teachers.value = response.data;
-    isTeachersLoaded.value = true;
-    console.log('Fetched teachers:', teachers.value);
+    const response = await axios.get('/api/users?role=TEACHER')
+    teachers.value = response.data
   } catch (error) {
-    console.error('Failed to fetch teachers:', error);
+    console.error('Failed to fetch teachers:', error)
   }
-};
-
-const fetchCourses = async () => {
-  if (!isTeachersLoaded.value) {
-    console.log('Waiting for teachers to be loaded...');
-    return;
-  }
-
-  try {
-    const response = await axios.get('http://localhost:8080/api/courses');
-    const oneTime = response.data.oneTimeCourses.map(c => ({ ...c, type: 'one-time' }));
-    const recurrent = response.data.recurrentCourses.map(c => ({ ...c, type: 'recurrent' }));
-    courses.value = [...oneTime, ...recurrent];
-  } catch (error) {
-    console.error('Failed to fetch courses:', error);
-  }
-};
-
+}
 
 const fetchStudents = async () => {
-  const response = await axios.get('http://localhost:8080/api/students')
-  students.value = response.data
-}
-
-// Helpers
-const findTeacherName = (id) => {
-  if (!id) {
-    console.warn('Invalid teacher ID:', id);
-    return 'Unknown';  // Dacă nu există ID valid, returnează 'Unknown'
+  try {
+    const response = await axios.get('/api/users?role=STUDENT')
+    students.value = response.data
+  } catch (error) {
+    console.error('Failed to fetch students:', error)
   }
-  const teacher = teachers.value.find(t => t.id === id);
-  return teacher ? teacher.name : 'Unknown';
 }
 
+const fetchCourses = async () => {
+  try {
+    const [oneTimeResponse, recurrentResponse] = await Promise.all([
+      axios.get('/api/one-time-courses'),
+      axios.get('/api/recurrent-courses')
+    ])
 
-// Add course
+    const oneTime = oneTimeResponse.data.map(c => ({ ...c, type: 'one-time' }))
+    const recurrent = recurrentResponse.data.map(c => ({ ...c, type: 'recurrent' }))
+    courses.value = [...oneTime, ...recurrent]
+  } catch (error) {
+    console.error('Failed to fetch courses:', error)
+  }
+}
+
+const findTeacherName = (id) => {
+  const teacher = teachers.value.find(t => t.id === id)
+  return teacher ? teacher.name : 'Unknown'
+}
+
 async function addCourse() {
   try {
     if (!newCourse.value.teacherId) {
-      alert('Please select a teacher');
-      return;
+      alert('Please select a teacher')
+      return
     }
-    if (newCourse.value.type === "one-time") {
-      // Creăm un obiect Date folosind datele din input, fără să o convertească automat în UTC
-      const startDateTime = new Date(`${newCourse.value.startDate}T${newCourse.value.startHour}:00`);
 
-      // Ajustăm la ora locală înainte de a trimite
-      const localDateTime = new Date(startDateTime.getTime() - startDateTime.getTimezoneOffset() * 60000);
-
-      const payload = {
+    let payload
+    if (newCourse.value.type === 'one-time') {
+      const startDateTime = new Date(`${newCourse.value.startDate}T${newCourse.value.startHour}:00`)
+      const localDateTime = new Date(startDateTime.getTime() - startDateTime.getTimezoneOffset() * 60000)
+      payload = {
         name: newCourse.value.name,
-        teacher: newCourse.value.teacherId,
-        classroom: newCourse.value.classroom || "Default Room",
+        classroom: newCourse.value.classroom || 'Default Room',
         imageUrl: newCourse.value.imageUrl,
-        startDateTime: localDateTime.toISOString(), // Trimit data în UTC, dar ajustată corect
-        status: "active",
-      };
-
-      await axios.post('http://localhost:8080/api/courses/one-time', payload);
-    } else if (newCourse.value.type === "recurrent") {
-      const payload = {
+        courseType: 'one-time',
+        startDateTime: localDateTime.toISOString(),
+        status: 'active',
+        teacherId: newCourse.value.teacherId,
+        studentIds: newCourse.value.students.join(',')
+      }
+      await axios.post('/api/one-time-courses', payload)
+    } else {
+      payload = {
         name: newCourse.value.name,
-        teacher: newCourse.value.teacherId,
-        classroom: newCourse.value.classroom || "Default Room",
+        classroom: newCourse.value.classroom || 'Default Room',
         imageUrl: newCourse.value.imageUrl,
+        courseType: 'recurrent',
         dayOfWeek: newCourse.value.dayOfWeek,
-        startTime: newCourse.value.startHour,
-        status: "active",
-      };
-
-      await axios.post('http://localhost:8080/api/courses/recurrent', payload);
+        startHour: newCourse.value.startHour,
+        status: 'active',
+        teacherId: newCourse.value.teacherId,
+        studentIds: newCourse.value.students.join(',')
+      }
+      await axios.post('/api/recurrent-courses', payload)
     }
 
-    showAddCourseModal.value = false;
-    fetchCourses(); // reîncarcă lista de cursuri
+    showAddCourseModal.value = false
+    fetchCourses()
   } catch (error) {
-    console.error(error);
+    console.error('Failed to add course:', error)
   }
 }
 
-
 onMounted(async () => {
-  await fetchTeachers();
-  await fetchCourses();
-  fetchStudents();
+  await fetchTeachers()
+  await fetchStudents()
+  await fetchCourses()
 })
-
 </script>
+
 
 
   <style scoped>
