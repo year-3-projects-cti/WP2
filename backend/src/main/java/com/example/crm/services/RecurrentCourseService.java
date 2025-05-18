@@ -31,4 +31,8 @@ public class RecurrentCourseService {
     public void delete(Long id) {
         repository.deleteById(id);
     }
+
+    public List<RecurrentCourse> getCoursesBetween(String start, String end) {
+        return repository.findAll();
+    }
 }

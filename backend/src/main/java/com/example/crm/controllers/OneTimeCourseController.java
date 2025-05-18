@@ -4,6 +4,8 @@ import com.example.crm.models.OneTimeCourse;
 import com.example.crm.services.OneTimeCourseService;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Optional;
 
@@ -37,4 +39,14 @@ public class OneTimeCourseController {
     public void delete(@PathVariable Long id) {
         service.delete(id);
     }
+
+    @GetMapping("/between")
+    public List<OneTimeCourse> getCoursesBetween(@RequestParam String start, @RequestParam String end) {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm");
+        LocalDateTime startDateTime = LocalDateTime.parse(start, formatter);
+        LocalDateTime endDateTime = LocalDateTime.parse(end, formatter);
+        return service.getCoursesBetween(startDateTime, endDateTime);
+    }
+    
+
 }

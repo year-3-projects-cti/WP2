@@ -191,44 +191,48 @@ const findTeacherName = (id) => {
 async function addCourse() {
   try {
     if (!newCourse.value.teacherId) {
-      alert('Please select a teacher')
-      return
+      alert('Please select a teacher');
+      return;
     }
 
-    let payload
+    let payload;
+
     if (newCourse.value.type === 'one-time') {
-      const startDateTime = new Date(`${newCourse.value.startDate}T${newCourse.value.startHour}:00`)
-      const localDateTime = new Date(startDateTime.getTime() - startDateTime.getTimezoneOffset() * 60000)
+      const startDateTime = new Date(`${newCourse.value.startDate}T${newCourse.value.startHour}:00`);
+      const localDateTime = new Date(startDateTime.getTime() - startDateTime.getTimezoneOffset() * 60000);
+
       payload = {
         name: newCourse.value.name,
         classroom: newCourse.value.classroom || 'Default Room',
         imageUrl: newCourse.value.imageUrl,
-        courseType: 'one-time',
-        startDateTime: localDateTime.toISOString(),
+        startDateTime: localDateTime.toISOString(), // Send only this, no separate startHour
         status: 'active',
         teacherId: newCourse.value.teacherId,
         studentIds: newCourse.value.students.join(',')
-      }
-      await axios.post('/api/one-time-courses', payload)
-    } else {
+      };
+
+      await axios.post('/api/one-time-courses', payload);
+
+    } else if (newCourse.value.type === 'recurrent') {
       payload = {
         name: newCourse.value.name,
         classroom: newCourse.value.classroom || 'Default Room',
         imageUrl: newCourse.value.imageUrl,
-        courseType: 'recurrent',
         dayOfWeek: newCourse.value.dayOfWeek,
-        startHour: newCourse.value.startHour,
+        startTime: newCourse.value.startHour, // HH:mm format expected by backend
         status: 'active',
         teacherId: newCourse.value.teacherId,
         studentIds: newCourse.value.students.join(',')
-      }
-      await axios.post('/api/recurrent-courses', payload)
+      };
+
+      await axios.post('/api/recurrent-courses', payload);
     }
 
-    showAddCourseModal.value = false
-    fetchCourses()
+    showAddCourseModal.value = false;
+    fetchCourses(); // Refresh courses list
+
   } catch (error) {
-    console.error('Failed to add course:', error)
+    console.error('Failed to add course:', error);
   }
 }
 

@@ -4,6 +4,7 @@ import com.example.crm.models.OneTimeCourse;
 import com.example.crm.repositories.OneTimeCourseRepository;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -30,5 +31,9 @@ public class OneTimeCourseService {
 
     public void delete(Long id) {
         repository.deleteById(id);
+    }
+
+    public List<OneTimeCourse> getCoursesBetween(LocalDateTime start, LocalDateTime end) {
+        return repository.findBetween(start, end);
     }
 }

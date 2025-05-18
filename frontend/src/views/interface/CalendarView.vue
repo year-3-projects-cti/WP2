@@ -114,48 +114,54 @@ function getDayIndex(date) {
   return day === 0 ? 6 : day - 1 // Convert Sunday (0) to 6, and shift others (1-6) to 0-5
 }
 
-// Fetch courses for week
+function mapDayOfWeek(day) {
+  const dayMapping = { MONDAY: 0, TUESDAY: 1, WEDNESDAY: 2, THURSDAY: 3, FRIDAY: 4, SATURDAY: 5, SUNDAY: 6 }
+  return dayMapping[day] ?? -1
+}
+function formatBackendDate(date) {
+  const day = date.getDate().toString().padStart(2, '0');
+  const month = (date.getMonth() + 1).toString().padStart(2, '0');
+  const year = date.getFullYear();
+  const hours = date.getHours().toString().padStart(2, '0');
+  const minutes = date.getMinutes().toString().padStart(2, '0');
+  return `${day}.${month}.${year} ${hours}:${minutes}`;
+}
+
+
 async function fetchCoursesForWeek() {
   loading.value = true
   try {
-    const startStr = formatBackendDate(currentWeekStart.value)
-    const endStr = formatBackendDate(currentWeekEnd.value)
+    const response = await axios.get('http://localhost:8080/api/one-time-courses');
+    const allCourses = response.data;
 
-    const response = await axios.get('http://localhost:8080/api/courses/between', {
-      params: { start: startStr, end: endStr }
-    })
+    const weekStart = new Date(currentWeekStart.value);
+    const weekEnd = new Date(currentWeekEnd.value);
 
-    // Process one-time courses
-    const oneTimeCourses = response.data.oneTimeCourses.map(course => {
-      const courseDate = new Date(course.startDateTime)
+    const filteredCourses = allCourses.filter(course => {
+      const courseDate = new Date(course.startDateTime);
+      return courseDate >= weekStart && courseDate <= weekEnd;
+    }).map(course => {
+      const courseDate = new Date(course.startDateTime);
       return {
         id: course.id,
         name: course.name,
-        day: getDayIndex(courseDate), // Convert to day index (0-6)
+        day: getDayIndex(courseDate),
         hour: courseDate.getHours(),
         status: course.status || 'active',
-        teacherId: course.teacher // API uses "teacher" not "teacherId"
-      }
-    })
+        teacherId: course.teacherId
+      };
+    });
 
-    // Process recurrent courses
-    const recurrentCourses = response.data.recurrentCourses.flatMap(course => {
-      return generateRecurrentSessionsForWeek(course)
-    })
-
-    courses.value = [...oneTimeCourses, ...recurrentCourses]
+    courses.value = filteredCourses;
 
   } catch (error) {
-    console.error('Failed to fetch courses:', error)
+    console.error('Failed to fetch courses:', error);
   } finally {
-    loading.value = false
+    loading.value = false;
   }
 }
 
-// Extra helpers
-function formatBackendDate(date) {
-  return `${date.getDate().toString().padStart(2, '0')}.${(date.getMonth() + 1).toString().padStart(2, '0')}.${date.getFullYear()} 00:00`
-}
+
 
 function generateRecurrentSessionsForWeek(course) {
   const sessions = []
@@ -213,7 +219,7 @@ function prevWeek() {
 // Init
 onMounted(async () => {
   await fetchCoursesForWeek()
-  const response = await axios.get('http://localhost:8080/api/teachers')
+  const response = await axios.get('http://localhost:8080/api/users?role=TEACHER')
   teachers.value = response.data
 })
 

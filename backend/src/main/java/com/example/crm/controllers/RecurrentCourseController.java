@@ -5,7 +5,6 @@ import com.example.crm.services.RecurrentCourseService;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/recurrent-courses")
@@ -24,8 +23,8 @@ public class RecurrentCourseController {
     }
 
     @GetMapping("/{id}")
-    public Optional<RecurrentCourse> getById(@PathVariable Long id) {
-        return service.getById(id);
+    public RecurrentCourse getById(@PathVariable Long id) {
+        return service.getById(id).orElse(null);
     }
 
     @PostMapping
@@ -36,5 +35,10 @@ public class RecurrentCourseController {
     @DeleteMapping("/{id}")
     public void delete(@PathVariable Long id) {
         service.delete(id);
+    }
+
+    @GetMapping("/between")
+    public List<RecurrentCourse> getCoursesBetween(@RequestParam String start, @RequestParam String end) {
+        return service.getCoursesBetween(start, end);
     }
 }
