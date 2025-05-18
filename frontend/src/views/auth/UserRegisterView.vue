@@ -76,6 +76,17 @@
                 />
               </div>
             </div>
+
+            <div class="form-group">
+              <label for="role">Role</label>
+              <div class="input-wrapper">
+                <span class="input-icon">👔</span>
+                <select id="role" v-model="role" required placeholder="Select your role">
+                  <option value="teacher">Teacher</option>
+                  <option value="student">Student</option>
+                  </select>
+              </div>
+            </div>
             
             <div class="form-group">
               <label for="password">Password</label>
@@ -234,6 +245,7 @@
   const showPassword = ref(false);
   const showConfirmPassword = ref(false);
   const agreeToTerms = ref(false);
+  const role = ref('student');
   
   // Password strength calculation
   const passwordStrength = computed(() => {
@@ -300,7 +312,9 @@
         email: email.value,
         company: company.value,
         password: password.value,
+        role: role.value.toUpperCase()
       });
+
 
       console.log('Registration successful:', response.data);
       router.push("/interface");
@@ -668,12 +682,63 @@
     padding: 0 10px;
   }
   
-  /* Social login buttons */
   .social-login {
     display: flex;
     justify-content: center;
     gap: 16px;
   }
+
+  .input-wrapper select {
+  flex: 1;
+  background: transparent;
+  border: none;
+  color: white;
+  padding: 14px 12px 14px 0;
+  font-size: 16px;
+  outline: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  cursor: pointer;
+}
+
+.input-wrapper select option {
+  background-color: #2980b9;
+  color: white;
+}
+
+.input-wrapper.select-wrapper {
+  position: relative;
+}
+
+.input-wrapper.select-wrapper::after {
+  content: '▼';
+  font-size: 12px;
+  position: absolute;
+  right: 16px;
+  top: 50%;
+  transform: translateY(-50%);
+  pointer-events: none;
+  opacity: 0.8;
+}
+
+.input-wrapper select:focus {
+  border-color: rgba(255, 255, 255, 0.4);
+}
+
+.input-wrapper select {
+  text-indent: 0;
+  text-overflow: '';
+  padding-right: 25px;
+}
+
+.input-wrapper select::-ms-expand {
+  display: none;
+}
+
+.input-wrapper.select-wrapper:hover {
+  border-color: rgba(255, 255, 255, 0.3);
+}
   
   .btn-social {
     width: 48px;

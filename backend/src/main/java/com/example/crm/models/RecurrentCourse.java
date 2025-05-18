@@ -1,8 +1,6 @@
 package com.example.crm.models;
 
 import jakarta.persistence.*;
-import java.time.DayOfWeek;
-import java.time.LocalTime;
 
 @Entity
 @Table(name = "recurrent_courses")
@@ -13,61 +11,42 @@ public class RecurrentCourse {
     private Long id;
 
     private String name;
-
-    private Integer teacher; // ID-ul profesorului
-
+    private String imageUrl;
+    private String courseType;
+    private int dayOfWeek;
+    private String startHour;
     private String classroom;
 
-    private String imageUrl;
-
-    private DayOfWeek dayOfWeek; // Ziua recurentei (LUNI, MARTI, etc.)
-
-    private LocalTime startTime; // Ora de început
-
-    private String status; // active / cancelled
+    private Long teacherId;       // Referință la user_id
+    private String studentIds;    // Ex: "1,2,3"
 
     public RecurrentCourse() {}
 
-    public RecurrentCourse(String name, Integer teacher, String classroom, String imageUrl, DayOfWeek dayOfWeek, LocalTime startTime, String status) {
-        this.name = name;
-        this.teacher = teacher;
-        this.classroom = classroom;
-        this.imageUrl = imageUrl;
-        this.dayOfWeek = dayOfWeek;
-        this.startTime = startTime;
-        this.status = status;
-    }
-
     // Getters și Setters
+
     public Long getId() { return id; }
 
-    public void setId(Long id) { this.id = id; }
-
     public String getName() { return name; }
-
     public void setName(String name) { this.name = name; }
 
-    public Integer getTeacher() { return teacher; }
-
-    public void setTeacher(Integer teacher) { this.teacher = teacher; }
-
-    public String getClassroom() { return classroom; }
-
-    public void setClassroom(String classroom) { this.classroom = classroom; }
-
     public String getImageUrl() { return imageUrl; }
-
     public void setImageUrl(String imageUrl) { this.imageUrl = imageUrl; }
 
-    public DayOfWeek getDayOfWeek() { return dayOfWeek; }
+    public String getCourseType() { return courseType; }
+    public void setCourseType(String courseType) { this.courseType = courseType; }
 
-    public void setDayOfWeek(DayOfWeek dayOfWeek) { this.dayOfWeek = dayOfWeek; }
+    public int getDayOfWeek() { return dayOfWeek; }
+    public void setDayOfWeek(int dayOfWeek) { this.dayOfWeek = dayOfWeek; }
 
-    public LocalTime getStartTime() { return startTime; }
+    public String getStartHour() { return startHour; }
+    public void setStartHour(String startHour) { this.startHour = startHour; }
 
-    public void setStartTime(LocalTime startTime) { this.startTime = startTime; }
+    public String getClassroom() { return classroom; }
+    public void setClassroom(String classroom) { this.classroom = classroom; }
 
-    public String getStatus() { return status; }
+    public Long getTeacherId() { return teacherId; }
+    public void setTeacherId(Long teacherId) { this.teacherId = teacherId; }
 
-    public void setStatus(String status) { this.status = status; }
+    public String getStudentIds() { return studentIds; }
+    public void setStudentIds(String studentIds) { this.studentIds = studentIds; }
 }

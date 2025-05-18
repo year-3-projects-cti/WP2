@@ -4,31 +4,31 @@ import com.example.crm.models.OneTimeCourse;
 import com.example.crm.repositories.OneTimeCourseRepository;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class OneTimeCourseService {
 
-    private final OneTimeCourseRepository oneTimeCourseRepository;
+    private final OneTimeCourseRepository repository;
 
-    public OneTimeCourseService(OneTimeCourseRepository oneTimeCourseRepository) {
-        this.oneTimeCourseRepository = oneTimeCourseRepository;
+    public OneTimeCourseService(OneTimeCourseRepository repository) {
+        this.repository = repository;
     }
 
-    public List<OneTimeCourse> findAll() {
-        return oneTimeCourseRepository.findAll();
+    public List<OneTimeCourse> getAll() {
+        return repository.findAll();
     }
 
-    public List<OneTimeCourse> findBetweenDates(LocalDateTime start, LocalDateTime end) {
-        return oneTimeCourseRepository.findByStartDateTimeBetween(start, end);
+    public Optional<OneTimeCourse> getById(Long id) {
+        return repository.findById(id);
     }
 
     public OneTimeCourse save(OneTimeCourse course) {
-        return oneTimeCourseRepository.save(course);
+        return repository.save(course);
     }
 
     public void delete(Long id) {
-        oneTimeCourseRepository.deleteById(id);
+        repository.deleteById(id);
     }
 }
