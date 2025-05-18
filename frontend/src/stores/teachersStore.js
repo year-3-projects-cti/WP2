@@ -1,4 +1,3 @@
-// src/stores/teachersStore.js
 import { defineStore } from 'pinia'
 import axios from 'axios'
 
@@ -12,7 +11,7 @@ export const useTeachersStore = defineStore('teachers', {
     async fetchTeachers() {
       this.loading = true
       try {
-        const response = await axios.get('/api/teachers')
+        const response = await axios.get('/api/users?role=TEACHER')
         this.teachers = response.data
       } catch (error) {
         this.error = 'Failed to fetch teachers'
@@ -23,7 +22,8 @@ export const useTeachersStore = defineStore('teachers', {
     },
     async addTeacher(teacher) {
       try {
-        await axios.post('/api/teachers', teacher)
+        teacher.role = 'TEACHER'
+        await axios.post('/api/users', teacher)
         await this.fetchTeachers()
       } catch (error) {
         this.error = 'Failed to add teacher'
@@ -32,7 +32,7 @@ export const useTeachersStore = defineStore('teachers', {
     },
     async updateTeacher(id, teacher) {
       try {
-        await axios.put(`/api/teachers/${id}`, teacher)
+        await axios.put(`/api/users/${id}`, teacher)
         await this.fetchTeachers()
       } catch (error) {
         this.error = 'Failed to update teacher'
@@ -41,7 +41,7 @@ export const useTeachersStore = defineStore('teachers', {
     },
     async deleteTeacher(id) {
       try {
-        await axios.delete(`/api/teachers/${id}`)
+        await axios.delete(`/api/users/${id}`)
         await this.fetchTeachers()
       } catch (error) {
         this.error = 'Failed to delete teacher'
