@@ -15,6 +15,32 @@ This project is a Customer Relationship Management (CRM) system specifically des
 - **Automated Google Meet Integration**: A meeting link is generated for each scheduled class.
 - **Payment System**: A token-based system is used for transactions.
 
+## 📖 Functional Requirements
+
+### Trello board: https://trello.com/b/cNMlIUxQ/crm-backlog-sprint-board
+
+- **User Story 1**: Student Enrollment
+
+As an administrative staff member,
+I want to enroll new students into the system with their personal and academic details,
+So that their profiles are available for class assignment and communication.
+
+⸻
+
+- **User Story 2**: Course Management
+
+As a teacher,
+I want to create and manage my course schedules, including class location, availability, and assigned students,
+So that I can efficiently plan and deliver my classes.
+
+⸻
+
+- **User Story 3**: Secure Login and Role-Based Access
+
+As a user of the system,
+I want to securely log in and see features based on my role (student, teacher, admin),
+So that I only access relevant data and actions.
+
 ## Technologies Used
 ### Backend
 - **Spring Boot** (Java 21) - for API and business logic  
