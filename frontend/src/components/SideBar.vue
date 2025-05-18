@@ -1,151 +1,30 @@
-<template>
-    <aside class="sidebar">
-      <nav>
-        <div class="sidebar-header">
-          <h3>Menu</h3>
-        </div>
-        <ul class="sidebar-menu">
-          <li class="menu-item" :class="{ active: isActive('/interface') }">
-            <router-link to="/interface">
-              <i class="fas fa-house-user"></i>
-              <span>Dashboard</span>
-            </router-link>
-          </li>
-          <li class="menu-item" :class="{ active: isActive('/students') }">
-            <router-link to="/students">
-              <i class="fas fa-users"></i>
-              <span>Students</span>
-            </router-link>
-          </li>
-          <li class="menu-item" :class="{ active: isActive('/teachers') }">
-            <router-link to="/teachers">
-              <i class="fas fa-user-tie"></i>
-              <span>Teachers</span>
-            </router-link>
-          </li>
-          <li class="menu-item" :class="{ active: isActive('/courses') }">
-            <router-link to="/courses">
-              <i class="fas fa-book-open"></i>
-              <span>Courses</span>
-            </router-link>
-          </li>
-          <li class="menu-item" :class="{ active: isActive('/calendar') }">
-            <router-link to="/calendar">
-              <i class="fas fa-calendar-check"></i>
-              <span>Calendar</span>
-            </router-link>
-          </li>
-          <li class="menu-item" :class="{ active: isActive('/payments') }">
-            <router-link to="/payments">
-              <i class="fas fa-wallet"></i>
-              <span>Payments</span>
-            </router-link>
-          </li>
-          <li class="menu-item" :class="{ active: isActive('/reports') }">
-            <router-link to="/reports">
-              <i class="fas fa-chart-pie"></i>
-              <span>Reports</span>
-            </router-link>
-          </li>
-          <li class="menu-item" :class="{ active: isActive('/messages') }">
-            <router-link to="/messages">
-              <i class="fas fa-envelope-open-text"></i>
-              <span>Messages</span>
-              <span class="menu-badge">5</span>
-            </router-link>
-          </li>
-          <li class="menu-item" :class="{ active: isActive('/settings') }">
-            <router-link to="/settings">
-              <i class="fas fa-sliders-h"></i>
-              <span>Settings</span>
-            </router-link>
-          </li>
-        </ul>
-      </nav>
-    </aside>
-  </template>
-  
-  <script setup>
-  import { useRoute } from 'vue-router'
-  
-  const route = useRoute()
-  
-  function isActive(path) {
-    return route.path.startsWith(path)
-  }
-  </script>
+<script setup>
+import { useRoute } from 'vue-router';
+import { useUsersStore } from '@/stores/usersStore';
+import { computed } from 'vue';
 
-<style scoped>
-/* Sidebar styles */
-.sidebar {
-font-family: 'Cal Sans', sans-serif;
-  width: 260px;
-  background: rgba(255, 255, 255, 0.05);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
-  border-right: 1px solid rgba(255, 255, 255, 0.1);
-  padding: 20px 0;
-  z-index: 4;
-  transition: all 0.3s ease;
-}
+const route = useRoute();
+const usersStore = useUsersStore();
 
-.sidebar-header {
-  padding: 0 20px 20px;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-  margin-bottom: 20px;
-}
+const menuItems = [
+  { path: '/interface', label: 'Dashboard', icon: 'fas fa-house-user', roles: ['ADMIN', 'TEACHER', 'STUDENT'] },
+  { path: '/students', label: 'Students', icon: 'fas fa-users', roles: ['ADMIN'] },
+  { path: '/teachers', label: 'Teachers', icon: 'fas fa-user-tie', roles: ['ADMIN'] },
+  { path: '/courses', label: 'Courses', icon: 'fas fa-book-open', roles: ['ADMIN', 'TEACHER'] },
+  { path: '/calendar', label: 'Calendar', icon: 'fas fa-calendar-check', roles: ['TEACHER', 'STUDENT'] },
+  { path: '/payments', label: 'Payments', icon: 'fas fa-wallet', roles: ['STUDENT'] },
+  { path: '/reports', label: 'Reports', icon: 'fas fa-chart-pie', roles: ['ADMIN'] },
+  { path: '/messages', label: 'Messages', icon: 'fas fa-envelope-open-text', badge: 5, roles: ['ADMIN', 'TEACHER', 'STUDENT'] },
+  { path: '/settings', label: 'Settings', icon: 'fas fa-sliders-h', roles: ['ADMIN', 'TEACHER', 'STUDENT'] }
+];
 
-.sidebar-header h3 {
-  font-size: 18px;
-  font-weight: 500;
-  color: rgba(255, 255, 255, 0.8);
-  margin: 0;
-}
+const filteredMenu = computed(() => {
+  if (!usersStore.user) return [];
+  const role = usersStore.user.role || '';
+  return menuItems.filter(item => item.roles.includes(role));
+});
 
-.sidebar-menu {
-  list-style: none;
-  padding: 0;
-  margin: 0;
+function isActive(path) {
+  return route.path.startsWith(path);
 }
-
-.menu-item {
-  position: relative;
-}
-
-.menu-item a {
-  display: flex;
-  align-items: center;
-  padding: 15px 20px;
-  color: rgba(255, 255, 255, 0.7);
-  text-decoration: none;
-  transition: all 0.3s ease;
-  font-size: 15px;
-}
-
-.menu-item a i {
-  margin-right: 15px;
-  font-size: 18px;
-  width: 20px;
-  text-align: center;
-}
-
-.menu-item a:hover {
-  background: rgba(255, 255, 255, 0.1);
-  color: white;
-}
-
-.menu-item.active a {
-  background: rgba(255, 255, 255, 0.15);
-  color: white;
-  border-left: 4px solid white;
-}
-
-.menu-badge {
-  background: #ff5252;
-  color: white;
-  font-size: 12px;
-  border-radius: 50px;
-  padding: 2px 8px;
-  margin-left: auto;
-}
-</style>
+</script>

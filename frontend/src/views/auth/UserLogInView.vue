@@ -154,14 +154,35 @@ async function handleLogin() {
       password: password.value
     });
 
-    console.log('Login successful:', response.data);
+    if (response.status !== 200) {
+      throw new Error('Login failed');
+    }
 
     const user = response.data;
-    authStore.login();
-    usersStore.user = user; // 🔥 setăm în store
-    localStorage.setItem('userId', user.id); // 🔥 salvăm ID-ul în localStorage
 
-    router.push("/interface");
+    if (!user || !user.role) {
+      throw new Error('Invalid user data received');
+    }
+
+    authStore.login();
+    usersStore.user = user;
+    localStorage.setItem('userId', user.id);
+
+    switch (user.role) {
+      case 'ADMIN':
+        router.push('/interface');
+        break;
+      case 'TEACHER':
+        router.push('/courses');
+        break;
+      case 'STUDENT':
+        router.push('/calendar');
+        break;
+      default:
+        alert('Invalid user role.');
+        router.push('/');
+    }
+
   } catch (error) {
     console.error('Login failed:', error.response?.data || error.message);
     alert('Invalid email or password.');

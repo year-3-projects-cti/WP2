@@ -8,6 +8,11 @@ import TeachersView from "@/views/interface/TeachersView.vue";
 import CalendarView from "@/views/interface/CalendarView.vue";
 import { useAuthStore } from "@/stores/useAuthStore";
 import CoursesView from "@/views/interface/CoursesView.vue";
+import TeacherDashbordView from "@/views/teacher/TeacherDashbordView.vue";
+import TeacherCoursesView from "@/views/teacher/TeacherCoursesView.vue";
+import TeacherReportsView from "@/views/teacher/TeacherReportsView.vue";
+import TeacherScheduleView from "@/views/teacher/TeacherScheduleView.vue";
+
 
 const routes = [
   { path: "/", component: DashboardView },
@@ -18,6 +23,11 @@ const routes = [
   { path: "/teachers", component: TeachersView, meta: { requiresAuth: true } },
   { path: "/calendar", component: CalendarView, meta: { requiresAuth: true } },
   { path: "/courses", component: CoursesView, meta: { requiresAuth: true } },
+  { path: "/teacher/dashboard", component: TeacherDashbordView, meta: { requiresAuth: true } },
+  { path: "/teacher/courses", component: TeacherCoursesView, meta: { requiresAuth: true } },
+  { path: "/teacher/reports", component: TeacherReportsView, meta: { requiresAuth: true } },
+  { path: "/teacher/calendar", component: TeacherScheduleView, meta: { requiresAuth: true } },
+  
 
 ];
 
