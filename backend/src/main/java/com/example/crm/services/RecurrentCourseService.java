@@ -35,4 +35,16 @@ public class RecurrentCourseService {
     public List<RecurrentCourse> getCoursesBetween(String start, String end) {
         return repository.findAll();
     }
+
+    public RecurrentCourse update(Long id, RecurrentCourse updatedCourse) {
+        return repository.findById(id)
+                .map(existingCourse -> {
+                    existingCourse.setName(updatedCourse.getName());
+                    existingCourse.setDayOfWeek(updatedCourse.getDayOfWeek());
+                    existingCourse.setClassroom(updatedCourse.getClassroom());
+                    existingCourse.setImageUrl(updatedCourse.getImageUrl());
+                    return repository.save(existingCourse);
+                })
+                .orElseThrow(() -> new RuntimeException("Course not found with id: " + id));
+    }
 }

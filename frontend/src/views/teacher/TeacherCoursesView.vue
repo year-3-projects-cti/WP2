@@ -11,9 +11,9 @@
     <span class="plus-icon">+</span> Add Course
   </button>
 </div>
-            <div v-if="teachers.length > 0">
+            <div>
     <div class="courses-grid">
-      <div v-for="course in filteredCourses" :key="course.id" class="course-card glass-panel">
+      <div v-for="course in filteredCourses" :key="course.id" class="course-card glass-panel" @click="openEditModal(course)">
         <div class="course-image">
           <img :src="course.imageUrl" :alt="course.name">
         </div>
@@ -120,6 +120,42 @@
       </form>
     </div>
   </div>
+
+  <div class="modal-overlay" v-if="showEditCourseModal" @click.self="showEditCourseModal = false">
+  <div class="modal-content glass-panel">
+    <h2>Edit Course</h2>
+    <form @submit.prevent="saveEditedCourse">
+      <div class="form-group">
+        <label>Course Name</label>
+        <input v-model="editedCourse.name" type="text" />
+      </div>
+
+      <div class="form-group">
+        <label>Course Image URL</label>
+        <input v-model="editedCourse.imageUrl" type="text" />
+      </div>
+
+      <div class="form-group">
+        <label>Classroom</label>
+        <input v-model="editedCourse.classroom" type="text" />
+      </div>
+
+      <div class="form-group">
+        <label>Teacher</label>
+        <select v-model="editedCourse.teacherId">
+          <option value="" disabled>Select Teacher</option>
+          <option v-for="teacher in teachers" :key="teacher.id" :value="teacher.id">{{ teacher.name }}</option>
+        </select>
+      </div>
+
+      <div class="modal-actions">
+        <button class="btn-details" type="button" @click="showEditCourseModal = false">Cancel</button>
+        <button class="btn-join" type="submit">Save Changes</button>
+      </div>
+    </form>
+  </div>
+</div>
+
   
   
     </div>
@@ -131,6 +167,8 @@ import axios from 'axios';
 import Sidebar from '@/components/SideBar.vue';
 import InterfaceNav from '@/components/InterfaceNav.vue';
 import { useUsersStore } from '@/stores/usersStore';
+const showEditCourseModal = ref(false);
+const editedCourse = ref(null);
 
 const usersStore = useUsersStore();
 
@@ -143,16 +181,67 @@ if (!usersStore.user && localStorage.getItem('user')) {
   }
 }
 
-const isAdmin = computed(() => usersStore.user?.role === 'ADMIN');
+function openEditModal(course) {
+  editedCourse.value = { ...course };
+  showEditCourseModal.value = true;
+}
+
+async function saveEditedCourse() {
+  try {
+    if (!editedCourse.value.teacherId) {
+      alert('Please select a teacher');
+      return;
+    }
+
+    const payload = {
+      name: editedCourse.value.name,
+      classroom: editedCourse.value.classroom,
+      imageUrl: editedCourse.value.imageUrl,
+      courseType: editedCourse.value.type,
+      startDateTime: editedCourse.value.startDateTime,
+      dayOfWeek: editedCourse.value.dayOfWeek,
+      startHour: editedCourse.value.startHour,
+      status: editedCourse.value.status,
+      teacherId: editedCourse.value.teacherId,
+      studentIds: editedCourse.value.studentIds,
+    };
+
+    const url = editedCourse.value.type === 'one-time'
+      ? `/api/one-time-courses/${editedCourse.value.id}`
+      : `/api/recurrent-courses/${editedCourse.value.id}`;
+
+    await axios.put(url, payload);
+
+    showEditCourseModal.value = false;
+    fetchCourses();
+  } catch (error) {
+    console.error('Failed to update course:', error);
+  }
+}
 
 const filteredCourses = computed(() => {
   const currentUser = usersStore.user;
-  if (!currentUser) return [];
-  if (currentUser.role === 'TEACHER') {
-    return courses.value.filter(course => course.teacherId === currentUser.id);
+  console.log('Current User:', currentUser);
+  console.log('All Courses:', courses.value);
+
+  if (!currentUser) {
+    console.log('No user detected, returning empty list.');
+    return [];
   }
+
+  if (currentUser.role === 'TEACHER') {
+    const filtered = courses.value.filter(course => course.teacherId === currentUser.id);
+    console.log(`Filtered Courses for TEACHER with id ${currentUser.id}:`, filtered);
+    return filtered;
+  }
+
+  console.log('User is not a TEACHER, returning all courses.');
   return courses.value;
 });
+
+
+const isAdmin = computed(() => usersStore.user?.role === 'ADMIN');
+
 
 // Data
 const teachers = ref([]);
@@ -201,10 +290,14 @@ const fetchCourses = async () => {
     const oneTime = oneTimeResponse.data.map(c => ({ ...c, type: 'one-time' }));
     const recurrent = recurrentResponse.data.map(c => ({ ...c, type: 'recurrent' }));
     courses.value = [...oneTime, ...recurrent];
+
+    console.log('Fetched Courses (one-time + recurrent):', courses.value);
   } catch (error) {
     console.error('Failed to fetch courses:', error);
   }
 };
+
+
 
 const findTeacherName = (id) => {
   const teacher = teachers.value.find(t => t.id === id);

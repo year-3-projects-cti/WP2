@@ -34,6 +34,18 @@ public class OneTimeCourseService {
     }
 
     public List<OneTimeCourse> getCoursesBetween(LocalDateTime start, LocalDateTime end) {
-        return repository.findBetween(start, end);
+        return repository.findAll();
+    }
+
+    public OneTimeCourse update(Long id, OneTimeCourse updatedCourse) {
+        return repository.findById(id)
+                .map(existingCourse -> {
+                    existingCourse.setName(updatedCourse.getName());
+                    existingCourse.setStartDateTime(updatedCourse.getStartDateTime());
+                    existingCourse.setClassroom(updatedCourse.getClassroom());
+                    existingCourse.setImageUrl(updatedCourse.getImageUrl());
+                    return repository.save(existingCourse);
+                })
+                .orElseThrow(() -> new RuntimeException("Course not found with id: " + id));
     }
 }

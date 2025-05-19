@@ -35,6 +35,11 @@ public class OneTimeCourseController {
         return service.save(course);
     }
 
+    @PutMapping("/{id}")
+    public OneTimeCourse update(@PathVariable Long id, @RequestBody OneTimeCourse updatedCourse) {
+        return service.update(id, updatedCourse);
+    }
+
     @DeleteMapping("/{id}")
     public void delete(@PathVariable Long id) {
         service.delete(id);
@@ -47,6 +52,4 @@ public class OneTimeCourseController {
         LocalDateTime endDateTime = LocalDateTime.parse(end, formatter);
         return service.getCoursesBetween(startDateTime, endDateTime);
     }
-    
-
 }

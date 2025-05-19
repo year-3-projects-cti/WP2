@@ -22,7 +22,7 @@ const routes = [
   { path: "/students", component: StudentsView, meta: { requiresAuth: true } },
   { path: "/teachers", component: TeachersView, meta: { requiresAuth: true } },
   { path: "/calendar", component: CalendarView, meta: { requiresAuth: true } },
-  { path: "/courses", component: CoursesView, meta: { requiresAuth: true } },
+  { path: "/courses", component: CoursesView, meta: { requiresAuth: true, requiresRole: 'ADMIN' } },
   { path: "/teacher/dashboard", component: TeacherDashbordView, meta: { requiresAuth: true } },
   { path: "/teacher/courses", component: TeacherCoursesView, meta: { requiresAuth: true } },
   { path: "/teacher/reports", component: TeacherReportsView, meta: { requiresAuth: true } },
@@ -40,14 +40,19 @@ router.beforeEach((to, from, next) => {
   const authStore = useAuthStore();
 
   if (to.path === "/" && authStore.isAuthenticated) {
-    next("/interface");
+    return next("/interface");
   }
-  else if (to.meta.requiresAuth && !authStore.isAuthenticated) {
-    next("/login");
+
+  if (to.meta.requiresAuth && !authStore.isAuthenticated) {
+    return next("/login");
   }
-  else {
-    next();
+
+  if (to.path === "/courses" && authStore.user?.role === "TEACHER") {
+    return next("/teacher/courses");
   }
+
+  next();
 });
+
 
 export default router;
