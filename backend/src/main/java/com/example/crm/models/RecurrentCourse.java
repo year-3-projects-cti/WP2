@@ -13,7 +13,7 @@ public class RecurrentCourse {
     private String name;
     private String imageUrl;
     private String courseType;
-    private int dayOfWeek;
+    private String dayOfWeek;
     private String startHour;
     private String classroom;
 
@@ -35,8 +35,9 @@ public class RecurrentCourse {
     public String getCourseType() { return courseType; }
     public void setCourseType(String courseType) { this.courseType = courseType; }
 
-    public int getDayOfWeek() { return dayOfWeek; }
-    public void setDayOfWeek(int dayOfWeek) { this.dayOfWeek = dayOfWeek; }
+    public String getDayOfWeek() { return dayOfWeek; }
+    public void setDayOfWeek(String dayOfWeek) { this.dayOfWeek = dayOfWeek; }
+
 
     public String getStartHour() { return startHour; }
     public void setStartHour(String startHour) { this.startHour = startHour; }

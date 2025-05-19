@@ -31,4 +31,16 @@ public class UserService {
     public void deleteUser(Long id) {
         userRepository.deleteById(id);
     }
+    public User updateUser(Long id, User updatedUser) {
+        return userRepository.findById(id)
+            .map(existingUser -> {
+                existingUser.setName(updatedUser.getName());
+                existingUser.setEmail(updatedUser.getEmail());
+                existingUser.setPassword(updatedUser.getPassword());
+                existingUser.setRole(updatedUser.getRole());
+                return userRepository.save(existingUser);
+            })
+            .orElseThrow(() -> new RuntimeException("User not found with id: " + id));
+    }
+    
 }

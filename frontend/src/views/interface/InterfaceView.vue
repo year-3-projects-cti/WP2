@@ -59,51 +59,10 @@
             </section>
   
             <!-- Calendar section -->
-            <section class="calendar-panel glass-panel">
-              <div class="panel-header">
-                <h2>Course Calendar</h2>
-                <div class="calendar-controls">
-                  <button class="control-btn"><i class="fas fa-chevron-left"></i></button>
-                  <h3>{{ currentDate }}</h3>
-                  <button class="control-btn"><i class="fas fa-chevron-right"></i></button>
-                </div>
-              </div>
-  
-              <div class="schedule-container">
-                <div class="time-column">
-                  <div class="time-slot" v-for="hour in hours" :key="hour">{{ hour }}:00</div>
-                </div>
-  
-                <div class="schedule-events">
-                  <div 
-                    v-for="event in todayEvents" 
-                    :key="event.id" 
-                    class="schedule-event" 
-                    :class="event.status"
-                    :style="{ 
-                      top: `${(event.startHour - 8) * 60 + event.startMinute}px`, 
-                      height: `${event.duration * 60}px` 
-                    }"
-                  >
-                    <div class="event-header">
-                      <h4>{{ event.title }}</h4>
-                      <span class="event-time">{{ formatEventTime(event) }}</span>
-                    </div>
-                    <div class="event-details">
-                      <p>{{ event.location }}</p>
-                      <p>Teacher: {{ event.teacher }}</p>
-                      <p class="seats-info" v-if="event.status !== 'past'">
-                        Seats: {{ event.seatsOccupied }}/{{ event.seatsTotal }}
-                        <span v-if="event.seatsOccupied < event.seatsTotal" class="available">Available</span>
-                        <span v-else class="full">Full</span>
-                      </p>
-                      <div class="event-actions" v-if="event.status === 'upcoming'">
-                        <button class="btn-details">Details</button>
-                        <button class="btn-join" v-if="event.seatsOccupied < event.seatsTotal">Join</button>
-                      </div>
-                    </div>
-                  </div>
-                </div>
+            <section class="glass-panel">
+              <h2>Course Calendar</h2>
+              <div class="calendar-wrapper">
+                <WeekCalendar />
               </div>
             </section>
           </div>
@@ -156,7 +115,8 @@ import { useStudentsStore } from '@/stores/studentsStore'
 import { useUsersStore } from '@/stores/usersStore' // 🔥 importăm usersStore
 import { useAuthStore } from '@/stores/useAuthStore'
 import { useRouter } from 'vue-router'
-  import Sidebar from '@/components/SideBar.vue'
+import Sidebar from '@/components/SideBar.vue'
+import WeekCalendar from '@/components/WeekCalendar.vue'
 
 const router = useRouter()
 const authStore = useAuthStore()
@@ -871,6 +831,10 @@ function formatEventTime(event) {
 .activity-icon.payment {
   background: rgba(46, 204, 113, 0.2);
   color: #2ecc71;
+}
+.calendar-wrapper {
+  max-height: 300px;
+  overflow-y: auto;
 }
 
 .activity-icon.message {

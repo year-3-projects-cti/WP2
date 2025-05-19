@@ -2,7 +2,6 @@
   <div class="dashboard-container">
     <InterfaceNav />
     <div class="main-container">
-      
       <Sidebar />
       <main class="main-content">
         <div class="glass-panel">
@@ -18,16 +17,6 @@
               <div class="form-group">
                 <input v-model="newStudent.email" type="email" placeholder="Email" required />
               </div>
-              <div class="form-group">
-                <input v-model="newStudent.studentClass" type="text" placeholder="Class" required />
-              </div>
-              <div class="form-group">
-                <select v-model="newStudent.status" required>
-                  <option value="" disabled>Select status</option>
-                  <option value="Active">Active</option>
-                  <option value="Inactive">Inactive</option>
-                </select>
-              </div>
               <button class="btn-join" type="submit">Add Student</button>
             </form>
           </section>
@@ -40,17 +29,13 @@
                 <tr>
                   <th>Name</th>
                   <th>Email</th>
-                  <th>Class</th>
-                  <th>Status</th>
                   <th>Actions</th>
                 </tr>
               </thead>
               <tbody>
-                <tr v-for="student in studentsStore.students" :key="student.id">
+                <tr v-for="student in students" :key="student.id">
                   <td>{{ student.name }}</td>
                   <td>{{ student.email }}</td>
-                  <td>{{ student.studentClass }}</td>
-                  <td>{{ student.status }}</td>
                   <td>
                     <button class="btn-details" @click="populateEditStudent(student)">Edit</button>
                     <button class="btn-join" @click="deleteStudent(student.id)">Delete</button>
@@ -70,34 +55,25 @@
               <div class="form-group">
                 <input v-model="editStudent.email" type="email" placeholder="Email" required />
               </div>
-              <div class="form-group">
-                <input v-model="editStudent.studentClass" type="text" placeholder="Class" required />
-              </div>
-              <div class="form-group">
-                <select v-model="editStudent.status" required>
-                  <option value="" disabled>Select status</option>
-                  <option value="Active">Active</option>
-                  <option value="Inactive">Inactive</option>
-                </select>
-              </div>
               <button class="btn-join" type="submit">Save Changes</button>
-              <button class="btn-details" @click="cancelEdit" type="button">Cancel</button>
+              <button class="btn-details" type="button" @click="cancelEdit">Cancel</button>
             </form>
           </section>
-
         </div>
       </main>
     </div>
   </div>
 </template>
 
+
 <script setup>
 import { ref, onMounted } from 'vue'
-import { useStudentsStore } from '@/stores/studentsStore'
+import axios from 'axios'
 import Sidebar from '@/components/SideBar.vue'
 import InterfaceNav from '@/components/InterfaceNav.vue'
 
-const studentsStore = useStudentsStore()
+// Local state
+const students = ref([])
 
 const newStudent = ref({
   name: '',
@@ -115,37 +91,69 @@ const editStudent = ref({
   status: ''
 })
 
-const fetchStudents = async () => {
-  await studentsStore.fetchStudents()
+// Fetch students from new API
+async function fetchStudents() {
+  try {
+    const response = await axios.get('/api/users?role=STUDENT')
+    students.value = response.data
+  } catch (error) {
+    console.error('Failed to fetch students:', error)
+  }
 }
 
-const addStudent = async () => {
-  await studentsStore.addStudent(newStudent.value)
-  newStudent.value = { name: '', email: '', studentClass: '', status: '' }
+// Add new student
+async function addStudent() {
+  try {
+    const payload = {
+      name: newStudent.value.name,
+      email: newStudent.value.email,
+      role: 'STUDENT'
+    }
+    await axios.post('/api/users', payload)
+    await fetchStudents()
+    newStudent.value = { name: '', email: '', studentClass: '', status: '' }
+  } catch (error) {
+    console.error('Failed to add student:', error)
+  }
 }
 
-const deleteStudent = async (id) => {
-  await studentsStore.deleteStudent(id)
+// Delete student
+async function deleteStudent(id) {
+  try {
+    await axios.delete(`/api/users/${id}`)
+    await fetchStudents()
+  } catch (error) {
+    console.error('Failed to delete student:', error)
+  }
 }
 
-const populateEditStudent = (student) => {
+// Prepare student for editing
+function populateEditStudent(student) {
   editMode.value = true
   editStudent.value = { ...student }
 }
 
-const updateStudent = async () => {
-  await studentsStore.updateStudent(editStudent.value.id, editStudent.value)
-  editMode.value = false
+// Save edited student
+async function updateStudent() {
+  try {
+    await axios.put(`/api/users/${editStudent.value.id}`, editStudent.value)
+    editMode.value = false
+    await fetchStudents()
+  } catch (error) {
+    console.error('Failed to update student:', error)
+  }
 }
 
-const cancelEdit = () => {
+// Cancel edit mode
+function cancelEdit() {
   editMode.value = false
   editStudent.value = { id: null, name: '', email: '', studentClass: '', status: '' }
 }
 
 onMounted(fetchStudents)
-</script>  
-  <style scoped>
+</script>
+
+<style scoped>
   
   .students-table {
     width: 100%;

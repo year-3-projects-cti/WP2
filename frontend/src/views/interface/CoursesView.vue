@@ -13,7 +13,13 @@
           </div>
           <div v-if="teachers.length > 0">
   <div class="courses-grid">
-    <div v-for="course in courses" :key="course.id" class="course-card glass-panel">
+        <div 
+          v-for="course in getCoursesForDayAndHour(index, hour)" 
+          :key="course.id"
+          class="course-item"
+          :class="getCourseStatusClass(course.status)"
+          @click="openEditModal(course)"
+        >
       <div class="course-image">
         <img :src="course.imageUrl" :alt="course.name">
       </div>
@@ -121,6 +127,42 @@
   </div>
 </div>
 
+<div class="modal-overlay" v-if="showEditCourseModal" @click.self="showEditCourseModal = false">
+  <div class="modal-content glass-panel">
+    <h2>Edit Course</h2>
+    <form @submit.prevent="saveEditedCourse">
+      <div class="form-group">
+        <label>Course Name</label>
+        <input v-model="editedCourse.name" type="text" />
+      </div>
+
+      <div class="form-group">
+        <label>Course Image URL</label>
+        <input v-model="editedCourse.imageUrl" type="text" />
+      </div>
+
+      <div class="form-group">
+        <label>Classroom</label>
+        <input v-model="editedCourse.classroom" type="text" />
+      </div>
+
+      <div class="form-group">
+        <label>Assign Teacher</label>
+        <select v-model="editedCourse.teacherId" required>
+          <option value="" disabled>Select Teacher</option>
+          <option v-for="teacher in teachers" :key="teacher.id" :value="teacher.id">{{ teacher.name }}</option>
+        </select>
+      </div>
+
+
+      <div class="modal-actions">
+        <button class="btn-details" type="button" @click="showEditCourseModal = false">Cancel</button>
+        <button class="btn-join" type="submit">Save Changes</button>
+      </div>
+    </form>
+  </div>
+</div>
+
 
   </div>
 </template>
@@ -130,6 +172,32 @@ import { ref, onMounted } from 'vue'
 import axios from 'axios'
 import Sidebar from '@/components/SideBar.vue'
 import InterfaceNav from '@/components/InterfaceNav.vue'
+
+const showEditCourseModal = ref(false)
+const editedCourse = ref(null)
+
+function openEditModal(course) {
+  editedCourse.value = { ...course }
+  showEditCourseModal.value = true
+}
+
+async function saveEditedCourse() {
+  try {
+    const payload = {
+      ...editedCourse.value,
+      courseType: 'one-time',
+      startDateTime: editedCourse.value.startDateTime,
+      status: editedCourse.value.status,
+      teacherId: editedCourse.value.teacherId,
+    }
+    await axios.put(`/api/one-time-courses/${editedCourse.value.id}`, payload)
+    showEditCourseModal.value = false
+    await fetchCourses()
+  } catch (error) {
+    console.error('Failed to update course:', error)
+  }
+}
+
 
 // Data
 const teachers = ref([])
@@ -241,6 +309,16 @@ onMounted(async () => {
   await fetchStudents()
   await fetchCourses()
 })
+function getCoursesForDayAndHour(day, hour) {
+  return courses.value.filter(course => course.day === day && course.hour === hour)
+}
+
+function getCourseStatusClass(status) {
+  return {
+    'course-active': status === 'active',
+    'course-cancelled': status === 'cancelled'
+  }
+}
 </script>
 
 

@@ -51,4 +51,10 @@ public class UserController {
             .findFirst()
             .orElse(null);
     }
+
+    @PutMapping("/{id}")
+    public User updateUser(@PathVariable Long id, @RequestBody User updatedUser) {
+        return userService.updateUser(id, updatedUser);
+    }
+
 }
